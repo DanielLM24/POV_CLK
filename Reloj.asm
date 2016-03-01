@@ -87,10 +87,10 @@ ORG 0x0004
 	    GOTO POP
 	    
 	CHECK_MINUTES_INC:
-	    BTFSC PORTB, RB4
+	    BTFSS PORTB, RB4
 	    GOTO MINUTES_INCREMENT
 	CHECK_HOURS_INC:  
-	    BTFSC PORTB, RB5
+	    BTFSS PORTB, RB5
 	    GOTO HOURS_INCREMENT
 	    GOTO POP
 		
@@ -120,6 +120,8 @@ ORG 0x0004
 	;	BCF PORTA, 1
 		
 	MINUTES_INCREMENT:
+	    BTFSC alarm_status, 0
+	    GOTO MINUTES_INCREMENT_ALARM
 	    INCF minutes, f			; Circular increment of minutes.	
 	    MOVF minutes, 0
 	    SUBLW .60
@@ -127,7 +129,16 @@ ORG 0x0004
 	    GOTO POP
 	    MOVLW .0
 	    MOVWF minutes
-	
+	    GOTO HOURS_INCREMENT
+	    MINUTES_INCREMENT_ALARM:
+		INCF alarm_minutes, f			; Circular increment of alarm minutes.	
+		MOVF alarm_minutes, 0
+		SUBLW .60
+		BTFSS STATUS, Z
+		GOTO POP
+		MOVLW .0
+		MOVWF alarm_minutes
+		GOTO POP
 	HOURS_DISPLAY:
 	 ;   BTFSC PORTA, 2
 	  ;  GOTO hour_hand_on
@@ -137,6 +148,8 @@ ORG 0x0004
 	;	BCF PORTA, 2
 	
 	HOURS_INCREMENT:
+	    BTFSC alarm_status, 0
+	    GOTO HOURS_INCREMENT_ALARM
 	    INCF hours, f			; Circular increment of hours.
 	    MOVF hours, 0
 	    SUBLW .24
@@ -144,6 +157,15 @@ ORG 0x0004
 	    GOTO POP
 	    MOVLW .0
 	    MOVWF hours
+	    GOTO POP
+	    HOURS_INCREMENT_ALARM:
+		INCF alarm_hours, f			; Circular increment of alarm hours.
+		MOVF alarm_hours, 0
+		SUBLW .24
+		BTFSS STATUS, Z
+		GOTO POP
+		MOVLW .0
+		MOVWF alarm_hours
 ;*******EXIT INTERRUPT VECTOR***********************************************        
     POP:
 	bcf	STATUS,RP0        ; ensure file register bank set to 0
@@ -196,8 +218,7 @@ MAINPROGRAM:
     CALL SPLIT_SECONDS		; Call to get HH:MM:SS
     CALL SPLIT_MINUTES
     CALL SPLIT_HOURS
-    MOVF alarm_status, 0
-    MOVWF PORTA
+    CALL CHECK_ALARM
     GOTO MAINPROGRAM		; Unconditional loop.
     
 SPLIT_SECONDS:				; Splits digits.
@@ -263,4 +284,17 @@ SPLIT_HOURS:
 	ADDWF hours_u, f
 	RETURN
 	
+ALARM_CHECK:
+    BTFSS alarm_status, 1   ;Alarm ON or OFF?
+    RETURN
+    MOVF minutes, 0
+    SUBWF alarm_minutes, 0
+    BTFSS STATUS, Z
+    RETURN
+    MOVF hours, 0
+    SUBWF alarm_hours, 0
+    BTFSS STATUS, Z
+    RETURN
+    ;Do something!!
+    RETURN
 END
