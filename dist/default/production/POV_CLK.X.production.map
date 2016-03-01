@@ -1,0 +1,108 @@
+MPLINK 5.08, LINKER
+Linker Map File - Created Mon Feb 29 19:49:10 2016
+
+                                 Section Info
+                  Section       Type    Address   Location Size(Bytes)
+                ---------  ---------  ---------  ---------  ---------
+                   .org_0       code   0x000000    program   0x000004
+                   .cinit    romdata   0x000002    program   0x000004
+                   .org_1       code   0x000004    program   0x000104
+.config_2007_BUILD/DEFAULT/PRODUCTION/RELOJ.O       code   0x002007    program   0x000002
+               .udata_shr      udata   0x00000c       data   0x00000c
+
+
+
+                              Program Memory Usage 
+                               Start         End      
+                           ---------   ---------      
+                            0x000000    0x000085      
+                            0x002007    0x002007      
+            135 out of 1094 program addresses used, program memory utilization is 12%
+
+
+
+                              Symbols - Sorted by Name
+                     Name    Address   Location    Storage File                     
+                ---------  ---------  ---------  --------- ---------                
+          CHECK_HOURS_INC   0x00001a    program     static D:\Documents\UVG\2016\7mo Semestre\Microcontroladores Aplicados a la Industria\POV_CLK.X\Reloj.asm
+        CHECK_MINUTES_INC   0x000018    program     static D:\Documents\UVG\2016\7mo Semestre\Microcontroladores Aplicados a la Industria\POV_CLK.X\Reloj.asm
+            HOURS_DISPLAY   0x00002b    program     static D:\Documents\UVG\2016\7mo Semestre\Microcontroladores Aplicados a la Industria\POV_CLK.X\Reloj.asm
+          HOURS_INCREMENT   0x00002b    program     static D:\Documents\UVG\2016\7mo Semestre\Microcontroladores Aplicados a la Industria\POV_CLK.X\Reloj.asm
+              MAINPROGRAM   0x000050    program     static D:\Documents\UVG\2016\7mo Semestre\Microcontroladores Aplicados a la Industria\POV_CLK.X\Reloj.asm
+          MINUTES_DISPLAY   0x000024    program     static D:\Documents\UVG\2016\7mo Semestre\Microcontroladores Aplicados a la Industria\POV_CLK.X\Reloj.asm
+        MINUTES_INCREMENT   0x000024    program     static D:\Documents\UVG\2016\7mo Semestre\Microcontroladores Aplicados a la Industria\POV_CLK.X\Reloj.asm
+                      POP   0x000032    program     static D:\Documents\UVG\2016\7mo Semestre\Microcontroladores Aplicados a la Industria\POV_CLK.X\Reloj.asm
+                     PUSH   0x000004    program     static D:\Documents\UVG\2016\7mo Semestre\Microcontroladores Aplicados a la Industria\POV_CLK.X\Reloj.asm
+                      RBI   0x000015    program     static D:\Documents\UVG\2016\7mo Semestre\Microcontroladores Aplicados a la Industria\POV_CLK.X\Reloj.asm
+          SECONDS_DISPLAY   0x00001d    program     static D:\Documents\UVG\2016\7mo Semestre\Microcontroladores Aplicados a la Industria\POV_CLK.X\Reloj.asm
+        SECONDS_INCREMENT   0x00001d    program     static D:\Documents\UVG\2016\7mo Semestre\Microcontroladores Aplicados a la Industria\POV_CLK.X\Reloj.asm
+                    SETUP   0x00003a    program     static D:\Documents\UVG\2016\7mo Semestre\Microcontroladores Aplicados a la Industria\POV_CLK.X\Reloj.asm
+              SPLIT_HOURS   0x000076    program     static D:\Documents\UVG\2016\7mo Semestre\Microcontroladores Aplicados a la Industria\POV_CLK.X\Reloj.asm
+       SPLIT_HOURS_BORROW   0x000083    program     static D:\Documents\UVG\2016\7mo Semestre\Microcontroladores Aplicados a la Industria\POV_CLK.X\Reloj.asm
+         SPLIT_HOURS_LOOP   0x000079    program     static D:\Documents\UVG\2016\7mo Semestre\Microcontroladores Aplicados a la Industria\POV_CLK.X\Reloj.asm
+         SPLIT_HOURS_ZERO   0x000081    program     static D:\Documents\UVG\2016\7mo Semestre\Microcontroladores Aplicados a la Industria\POV_CLK.X\Reloj.asm
+            SPLIT_MINUTES   0x000066    program     static D:\Documents\UVG\2016\7mo Semestre\Microcontroladores Aplicados a la Industria\POV_CLK.X\Reloj.asm
+     SPLIT_MINUTES_BORROW   0x000073    program     static D:\Documents\UVG\2016\7mo Semestre\Microcontroladores Aplicados a la Industria\POV_CLK.X\Reloj.asm
+       SPLIT_MINUTES_LOOP   0x000069    program     static D:\Documents\UVG\2016\7mo Semestre\Microcontroladores Aplicados a la Industria\POV_CLK.X\Reloj.asm
+       SPLIT_MINUTES_ZERO   0x000071    program     static D:\Documents\UVG\2016\7mo Semestre\Microcontroladores Aplicados a la Industria\POV_CLK.X\Reloj.asm
+            SPLIT_SECONDS   0x000056    program     static D:\Documents\UVG\2016\7mo Semestre\Microcontroladores Aplicados a la Industria\POV_CLK.X\Reloj.asm
+     SPLIT_SECONDS_BORROW   0x000063    program     static D:\Documents\UVG\2016\7mo Semestre\Microcontroladores Aplicados a la Industria\POV_CLK.X\Reloj.asm
+       SPLIT_SECONDS_LOOP   0x000059    program     static D:\Documents\UVG\2016\7mo Semestre\Microcontroladores Aplicados a la Industria\POV_CLK.X\Reloj.asm
+       SPLIT_SECONDS_ZERO   0x000061    program     static D:\Documents\UVG\2016\7mo Semestre\Microcontroladores Aplicados a la Industria\POV_CLK.X\Reloj.asm
+              alarm_hours   0x000017       data     static D:\Documents\UVG\2016\7mo Semestre\Microcontroladores Aplicados a la Industria\POV_CLK.X\Reloj.asm
+            alarm_minutes   0x000016       data     static D:\Documents\UVG\2016\7mo Semestre\Microcontroladores Aplicados a la Industria\POV_CLK.X\Reloj.asm
+            delay_counter   0x00000c       data     static D:\Documents\UVG\2016\7mo Semestre\Microcontroladores Aplicados a la Industria\POV_CLK.X\Reloj.asm
+                    hours   0x000013       data     static D:\Documents\UVG\2016\7mo Semestre\Microcontroladores Aplicados a la Industria\POV_CLK.X\Reloj.asm
+                  hours_t   0x000014       data     static D:\Documents\UVG\2016\7mo Semestre\Microcontroladores Aplicados a la Industria\POV_CLK.X\Reloj.asm
+                  hours_u   0x000015       data     static D:\Documents\UVG\2016\7mo Semestre\Microcontroladores Aplicados a la Industria\POV_CLK.X\Reloj.asm
+                  minutes   0x000010       data     static D:\Documents\UVG\2016\7mo Semestre\Microcontroladores Aplicados a la Industria\POV_CLK.X\Reloj.asm
+                minutes_t   0x000011       data     static D:\Documents\UVG\2016\7mo Semestre\Microcontroladores Aplicados a la Industria\POV_CLK.X\Reloj.asm
+                minutes_u   0x000012       data     static D:\Documents\UVG\2016\7mo Semestre\Microcontroladores Aplicados a la Industria\POV_CLK.X\Reloj.asm
+                  seconds   0x00000d       data     static D:\Documents\UVG\2016\7mo Semestre\Microcontroladores Aplicados a la Industria\POV_CLK.X\Reloj.asm
+                seconds_t   0x00000e       data     static D:\Documents\UVG\2016\7mo Semestre\Microcontroladores Aplicados a la Industria\POV_CLK.X\Reloj.asm
+                seconds_u   0x00000f       data     static D:\Documents\UVG\2016\7mo Semestre\Microcontroladores Aplicados a la Industria\POV_CLK.X\Reloj.asm
+
+
+
+                              Symbols - Sorted by Address
+                     Name    Address   Location    Storage File                     
+                ---------  ---------  ---------  --------- ---------                
+                     PUSH   0x000004    program     static D:\Documents\UVG\2016\7mo Semestre\Microcontroladores Aplicados a la Industria\POV_CLK.X\Reloj.asm
+                      RBI   0x000015    program     static D:\Documents\UVG\2016\7mo Semestre\Microcontroladores Aplicados a la Industria\POV_CLK.X\Reloj.asm
+        CHECK_MINUTES_INC   0x000018    program     static D:\Documents\UVG\2016\7mo Semestre\Microcontroladores Aplicados a la Industria\POV_CLK.X\Reloj.asm
+          CHECK_HOURS_INC   0x00001a    program     static D:\Documents\UVG\2016\7mo Semestre\Microcontroladores Aplicados a la Industria\POV_CLK.X\Reloj.asm
+          SECONDS_DISPLAY   0x00001d    program     static D:\Documents\UVG\2016\7mo Semestre\Microcontroladores Aplicados a la Industria\POV_CLK.X\Reloj.asm
+        SECONDS_INCREMENT   0x00001d    program     static D:\Documents\UVG\2016\7mo Semestre\Microcontroladores Aplicados a la Industria\POV_CLK.X\Reloj.asm
+          MINUTES_DISPLAY   0x000024    program     static D:\Documents\UVG\2016\7mo Semestre\Microcontroladores Aplicados a la Industria\POV_CLK.X\Reloj.asm
+        MINUTES_INCREMENT   0x000024    program     static D:\Documents\UVG\2016\7mo Semestre\Microcontroladores Aplicados a la Industria\POV_CLK.X\Reloj.asm
+            HOURS_DISPLAY   0x00002b    program     static D:\Documents\UVG\2016\7mo Semestre\Microcontroladores Aplicados a la Industria\POV_CLK.X\Reloj.asm
+          HOURS_INCREMENT   0x00002b    program     static D:\Documents\UVG\2016\7mo Semestre\Microcontroladores Aplicados a la Industria\POV_CLK.X\Reloj.asm
+                      POP   0x000032    program     static D:\Documents\UVG\2016\7mo Semestre\Microcontroladores Aplicados a la Industria\POV_CLK.X\Reloj.asm
+                    SETUP   0x00003a    program     static D:\Documents\UVG\2016\7mo Semestre\Microcontroladores Aplicados a la Industria\POV_CLK.X\Reloj.asm
+              MAINPROGRAM   0x000050    program     static D:\Documents\UVG\2016\7mo Semestre\Microcontroladores Aplicados a la Industria\POV_CLK.X\Reloj.asm
+            SPLIT_SECONDS   0x000056    program     static D:\Documents\UVG\2016\7mo Semestre\Microcontroladores Aplicados a la Industria\POV_CLK.X\Reloj.asm
+       SPLIT_SECONDS_LOOP   0x000059    program     static D:\Documents\UVG\2016\7mo Semestre\Microcontroladores Aplicados a la Industria\POV_CLK.X\Reloj.asm
+       SPLIT_SECONDS_ZERO   0x000061    program     static D:\Documents\UVG\2016\7mo Semestre\Microcontroladores Aplicados a la Industria\POV_CLK.X\Reloj.asm
+     SPLIT_SECONDS_BORROW   0x000063    program     static D:\Documents\UVG\2016\7mo Semestre\Microcontroladores Aplicados a la Industria\POV_CLK.X\Reloj.asm
+            SPLIT_MINUTES   0x000066    program     static D:\Documents\UVG\2016\7mo Semestre\Microcontroladores Aplicados a la Industria\POV_CLK.X\Reloj.asm
+       SPLIT_MINUTES_LOOP   0x000069    program     static D:\Documents\UVG\2016\7mo Semestre\Microcontroladores Aplicados a la Industria\POV_CLK.X\Reloj.asm
+       SPLIT_MINUTES_ZERO   0x000071    program     static D:\Documents\UVG\2016\7mo Semestre\Microcontroladores Aplicados a la Industria\POV_CLK.X\Reloj.asm
+     SPLIT_MINUTES_BORROW   0x000073    program     static D:\Documents\UVG\2016\7mo Semestre\Microcontroladores Aplicados a la Industria\POV_CLK.X\Reloj.asm
+              SPLIT_HOURS   0x000076    program     static D:\Documents\UVG\2016\7mo Semestre\Microcontroladores Aplicados a la Industria\POV_CLK.X\Reloj.asm
+         SPLIT_HOURS_LOOP   0x000079    program     static D:\Documents\UVG\2016\7mo Semestre\Microcontroladores Aplicados a la Industria\POV_CLK.X\Reloj.asm
+         SPLIT_HOURS_ZERO   0x000081    program     static D:\Documents\UVG\2016\7mo Semestre\Microcontroladores Aplicados a la Industria\POV_CLK.X\Reloj.asm
+       SPLIT_HOURS_BORROW   0x000083    program     static D:\Documents\UVG\2016\7mo Semestre\Microcontroladores Aplicados a la Industria\POV_CLK.X\Reloj.asm
+            delay_counter   0x00000c       data     static D:\Documents\UVG\2016\7mo Semestre\Microcontroladores Aplicados a la Industria\POV_CLK.X\Reloj.asm
+                  seconds   0x00000d       data     static D:\Documents\UVG\2016\7mo Semestre\Microcontroladores Aplicados a la Industria\POV_CLK.X\Reloj.asm
+                seconds_t   0x00000e       data     static D:\Documents\UVG\2016\7mo Semestre\Microcontroladores Aplicados a la Industria\POV_CLK.X\Reloj.asm
+                seconds_u   0x00000f       data     static D:\Documents\UVG\2016\7mo Semestre\Microcontroladores Aplicados a la Industria\POV_CLK.X\Reloj.asm
+                  minutes   0x000010       data     static D:\Documents\UVG\2016\7mo Semestre\Microcontroladores Aplicados a la Industria\POV_CLK.X\Reloj.asm
+                minutes_t   0x000011       data     static D:\Documents\UVG\2016\7mo Semestre\Microcontroladores Aplicados a la Industria\POV_CLK.X\Reloj.asm
+                minutes_u   0x000012       data     static D:\Documents\UVG\2016\7mo Semestre\Microcontroladores Aplicados a la Industria\POV_CLK.X\Reloj.asm
+                    hours   0x000013       data     static D:\Documents\UVG\2016\7mo Semestre\Microcontroladores Aplicados a la Industria\POV_CLK.X\Reloj.asm
+                  hours_t   0x000014       data     static D:\Documents\UVG\2016\7mo Semestre\Microcontroladores Aplicados a la Industria\POV_CLK.X\Reloj.asm
+                  hours_u   0x000015       data     static D:\Documents\UVG\2016\7mo Semestre\Microcontroladores Aplicados a la Industria\POV_CLK.X\Reloj.asm
+            alarm_minutes   0x000016       data     static D:\Documents\UVG\2016\7mo Semestre\Microcontroladores Aplicados a la Industria\POV_CLK.X\Reloj.asm
+              alarm_hours   0x000017       data     static D:\Documents\UVG\2016\7mo Semestre\Microcontroladores Aplicados a la Industria\POV_CLK.X\Reloj.asm
+
+
