@@ -29,6 +29,7 @@ hours_t		res 1
 hours_u		res 1
 alarm_minutes	res 1			; Variables for alarm setting.
 alarm_hours	res 1
+alarm_status	res 1	
 ;*******************************************************************************
 ORG 0x0000
     NOP
@@ -63,6 +64,28 @@ ORG 0x0004
 	GOTO POP
 	BCF INTCON, RBIF	    ; Interrupt flag clear.
 	
+	CHECK_MODE:
+	    BTFSS PORTB, RB6
+	    GOTO CHECK_ALARM_STATE
+	    BTFSC alarm_status, 0	    ; Check clock mode (Alarm Set/Run)		
+	    GOTO alarm_setting	
+	    BSF alarm_status, 0		    ; Enable alarm setting.
+	    GOTO POP
+	    alarm_setting:
+            BCF alarm_status, 0		    ; Enable run mode.
+	    GOTO POP
+	
+	CHECK_ALARM_STATE:
+	    BTFSS PORTB, RB7	    
+	    GOTO CHECK_MINUTES_INC
+	    BTFSC alarm_status, 1   ; Check alarm status (ON/OFF)		
+	    GOTO alarm_on	
+	    BSF alarm_status, 1	    ; Enable alarm.
+	    GOTO POP
+	    alarm_on:
+            BCF alarm_status, 1	    ; Disable alarm.
+	    GOTO POP
+	    
 	CHECK_MINUTES_INC:
 	    BTFSC PORTB, RB4
 	    GOTO MINUTES_INCREMENT
@@ -143,7 +166,7 @@ SETUP:
     MOVLW b'11110000'
     MOVWF TRISB
     CLRF TRISA
-    MOVLW b'10101000'
+    MOVLW b'10101000'		; Enables interrupts from TMR0 an RB (IOC).
     MOVWF INTCON
 	    
     BCF OPTION_REG, T0CS        ; TMR0 CLOCK SOURCE: INTERNAL INSTRUCTION CYCLE CLOCK
@@ -164,13 +187,19 @@ SETUP:
     MOVWF minutes
     MOVWF hours
     
-
-    
+    CLRF alarm_minutes
+    CLRF alarm_hours
+    CLRF alarm_status		;To determine whether alarm is ON/OFF or in SET mode.
+				;  Bit	|   State   |	Mode
+				;   0	|     S	    |	Set
+				;	|     C	    |	Run
+				;   1	|     S	    |	Alarm ON
+				;	|     C	    |	Alarm OFF
 MAINPROGRAM:
     CALL SPLIT_SECONDS		; Call to get HH:MM:SS
     CALL SPLIT_MINUTES
     CALL SPLIT_HOURS
-    MOVF minutes_u, 0
+    MOVF alarm_status, 0
     MOVWF PORTA
     GOTO MAINPROGRAM		; Unconditional loop.
     

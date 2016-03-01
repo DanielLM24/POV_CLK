@@ -1,4 +1,4 @@
-MPASM 5.65                         RELOJ.ASM   2-29-2016  19:49:09         PAGE  1
+MPASM 5.65                         RELOJ.ASM   2-29-2016  22:57:42         PAGE  1
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -48,289 +48,330 @@ Warning[205]: Found directive in column 1. (UDATA_SHR)
 0015                  00029 hours_u         res 1
 0016                  00030 alarm_minutes   res 1                   ; Variables for alarm setting.
 0017                  00031 alarm_hours     res 1
-                      00032 ;*******************************************************************************
+0018                  00032 alarm_status    res 1   
+                      00033 ;*******************************************************************************
 Warning[205]: Found directive in column 1. (ORG)
-                      00033 ORG 0x0000
-0000   0000           00034     NOP
-0001   2???           00035     GOTO SETUP
-                      00036 ;*******************************************************************************
+                      00034 ORG 0x0000
+0000   0000           00035     NOP
+0001   2???           00036     GOTO SETUP
+                      00037 ;*******************************************************************************
 Warning[205]: Found directive in column 1. (ORG)
-                      00037 ORG 0x0004
+                      00038 ORG 0x0004
+MPASM 5.65                         RELOJ.ASM   2-29-2016  22:57:42         PAGE  2
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
 Warning[207]: Found label after column 1. (PUSH)
-MPASM 5.65                         RELOJ.ASM   2-29-2016  19:49:09         PAGE  2
-
-
-LOC  OBJECT CODE     LINE SOURCE TEXT
-  VALUE
-
-0004                  00038     PUSH:
-0004   00A0           00039         movwf   w_temp            ; save off current W register contents
-0005   0803           00040         movf    STATUS,w          ; move status register into W register
-0006   1283           00041         bcf     STATUS,RP0        ; ensure file register bank set to 0
-0007   00A1           00042         movwf   status_temp       ; save off contents of STATUS register
-0008   080A           00043         movf    PCLATH,w          ; move pclath register into w register
-0009   00A2           00044         movwf   pclath_temp       ; save off contents of PCLATH register
-                      00045 
-                      00046 ;********TMR0 INTERRUPTION**************************************************
-000A   1D0B           00047         BTFSS INTCON, T0IF        ; Check T0IF.
-000B   2???           00048         GOTO RBI                  ; Exit interrupt vector. 
-000C   110B           00049         BCF INTCON, T0IF
-000D   303D           00050         MOVLW .61                 ; Pre-load TMR0
-000E   0081           00051         MOVWF TMR0
-000F   158B           00052         BSF INTCON, RBIE        
-                      00053 
-0010   0B??           00054         DECFSZ delay_counter, 1   ; 1 second has passed.
-0011   2???           00055         GOTO POP
-                      00056         
-0012   3028           00057         MOVLW .40                   ; For 1 second delay.
-0013   00??           00058         MOVWF delay_counter     
-0014   2???           00059         GOTO SECONDS_INCREMENT
-                      00060         
+0004                  00039     PUSH:
+0004   00A0           00040         movwf   w_temp            ; save off current W register contents
+0005   0803           00041         movf    STATUS,w          ; move status register into W register
+0006   1283           00042         bcf     STATUS,RP0        ; ensure file register bank set to 0
+0007   00A1           00043         movwf   status_temp       ; save off contents of STATUS register
+0008   080A           00044         movf    PCLATH,w          ; move pclath register into w register
+0009   00A2           00045         movwf   pclath_temp       ; save off contents of PCLATH register
+                      00046 
+                      00047 ;********TMR0 INTERRUPTION**************************************************
+000A   1D0B           00048         BTFSS INTCON, T0IF        ; Check T0IF.
+000B   2???           00049         GOTO RBI                  ; Exit interrupt vector. 
+000C   110B           00050         BCF INTCON, T0IF
+000D   303D           00051         MOVLW .61                 ; Pre-load TMR0
+000E   0081           00052         MOVWF TMR0
+000F   158B           00053         BSF INTCON, RBIE        
+                      00054 
+0010   0B??           00055         DECFSZ delay_counter, 1   ; 1 second has passed.
+0011   2???           00056         GOTO POP
+                      00057         
+0012   3028           00058         MOVLW .40                   ; For 1 second delay.
+0013   00??           00059         MOVWF delay_counter     
+0014   2???           00060         GOTO SECONDS_INCREMENT
+                      00061         
 Warning[207]: Found label after column 1. (RBI)
-0015                  00061     RBI:
-0015   1C0B           00062         BTFSS INTCON, RBIF          ; Interrupt not caused by button press.
-0016   2???           00063         GOTO POP
-0017   100B           00064         BCF INTCON, RBIF            ; Interrupt flag clear.
-                      00065         
+0015                  00062     RBI:
+0015   1C0B           00063         BTFSS INTCON, RBIF          ; Interrupt not caused by button press.
+0016   2???           00064         GOTO POP
+0017   100B           00065         BCF INTCON, RBIF            ; Interrupt flag clear.
+                      00066         
+Warning[207]: Found label after column 1. (CHECK_MODE)
+0018                  00067         CHECK_MODE:
+0018   1F06           00068             BTFSS PORTB, RB6
+0019   2???           00069             GOTO CHECK_ALARM_STATE
+001A   1800           00070             BTFSC alarm_status, 0           ; Check clock mode (Alarm Set/Run)          
+001B   2???           00071             GOTO alarm_setting  
+001C   1400           00072             BSF alarm_status, 0     ; Enable alarm setting.
+001D   2???           00073             GOTO POP
+Warning[207]: Found label after column 1. (alarm_setting)
+001E                  00074             alarm_setting:
+001E   1000           00075             BCF alarm_status, 0     ; Enable run mode.
+001F   2???           00076             GOTO POP
+                      00077         
+Warning[207]: Found label after column 1. (CHECK_ALARM_STATE)
+0020                  00078         CHECK_ALARM_STATE:
+0020   1F86           00079             BTFSS PORTB, RB7        
+0021   2???           00080             GOTO CHECK_MINUTES_INC
+0022   1880           00081             BTFSC alarm_status, 1   ; Check alarm status (ON/OFF)               
+0023   2???           00082             GOTO alarm_on       
+0024   1480           00083             BSF alarm_status, 1     ; Enable alarm.
+0025   2???           00084             GOTO POP
+Warning[207]: Found label after column 1. (alarm_on)
+0026                  00085             alarm_on:
+MPASM 5.65                         RELOJ.ASM   2-29-2016  22:57:42         PAGE  3
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+0026   1080           00086             BCF alarm_status, 1     ; Disable alarm.
+0027   2???           00087             GOTO POP
+                      00088             
 Warning[207]: Found label after column 1. (CHECK_MINUTES_INC)
-0018                  00066         CHECK_MINUTES_INC:
-0018   1A06           00067             BTFSC PORTB, RB4
-0019   2???           00068             GOTO MINUTES_INCREMENT
+0028                  00089         CHECK_MINUTES_INC:
+0028   1A06           00090             BTFSC PORTB, RB4
+0029   2???           00091             GOTO MINUTES_INCREMENT
 Warning[207]: Found label after column 1. (CHECK_HOURS_INC)
-001A                  00069         CHECK_HOURS_INC:  
-001A   1A86           00070             BTFSC PORTB, RB5
-001B   2???           00071             GOTO HOURS_INCREMENT
-001C   2???           00072             GOTO POP
-                      00073         
-                      00074            
-                      00075             
-                      00076         
+002A                  00092         CHECK_HOURS_INC:  
+002A   1A86           00093             BTFSC PORTB, RB5
+002B   2???           00094             GOTO HOURS_INCREMENT
+002C   2???           00095             GOTO POP
+                      00096         
+                      00097            
+                      00098             
+                      00099         
 Warning[207]: Found label after column 1. (SECONDS_DISPLAY)
-001D                  00077         SECONDS_DISPLAY:
-                      00078         ;    BTFSC PORTA,0              
-                      00079          ;   GOTO second_hand_on        
-                      00080           ;  BSF PORTA,0                        ; Apaga el LED
-                      00081            ; GOTO SECONDS_INCREMENT
-                      00082             ;second_hand_on:
-                      00083              ;   BCF PORTA,0                    ; Enciende el LED 
-                      00084         
+002D                  00100         SECONDS_DISPLAY:
+                      00101         ;    BTFSC PORTA,0              
+                      00102          ;   GOTO second_hand_on        
+                      00103           ;  BSF PORTA,0                        ; Apaga el LED
+                      00104            ; GOTO SECONDS_INCREMENT
+                      00105             ;second_hand_on:
+                      00106              ;   BCF PORTA,0                    ; Enciende el LED 
+                      00107         
 Warning[207]: Found label after column 1. (SECONDS_INCREMENT)
-001D                  00085         SECONDS_INCREMENT:
-MPASM 5.65                         RELOJ.ASM   2-29-2016  19:49:09         PAGE  3
-
-
-LOC  OBJECT CODE     LINE SOURCE TEXT
-  VALUE
-
-001D   0A??           00086             INCF seconds, f                     ; Circular increment of seconds.
-001E   08??           00087             MOVF seconds, 0
-001F   3C3C           00088             SUBLW .60
-0020   1D03           00089             BTFSS STATUS, Z
-0021   2???           00090             GOTO POP
-0022   3000           00091             MOVLW .0
-0023   00??           00092             MOVWF seconds
-                      00093 
+002D                  00108         SECONDS_INCREMENT:
+002D   0A??           00109             INCF seconds, f                     ; Circular increment of seconds.
+002E   08??           00110             MOVF seconds, 0
+002F   3C3C           00111             SUBLW .60
+0030   1D03           00112             BTFSS STATUS, Z
+0031   2???           00113             GOTO POP
+0032   3000           00114             MOVLW .0
+0033   00??           00115             MOVWF seconds
+                      00116 
 Warning[207]: Found label after column 1. (MINUTES_DISPLAY)
-0024                  00094         MINUTES_DISPLAY:
-                      00095             ;BTFSC PORTA, 1
-                      00096             ;GOTO minute_hand_on
-                      00097             ;BSF PORTA, 1
-                      00098             ;GOTO MINUTES_INCREMENT
-                      00099             ;minute_hand_on:
-                      00100         ;       BCF PORTA, 1
-                      00101                 
+0034                  00117         MINUTES_DISPLAY:
+                      00118             ;BTFSC PORTA, 1
+                      00119             ;GOTO minute_hand_on
+                      00120             ;BSF PORTA, 1
+                      00121             ;GOTO MINUTES_INCREMENT
+                      00122             ;minute_hand_on:
+                      00123         ;       BCF PORTA, 1
+                      00124                 
 Warning[207]: Found label after column 1. (MINUTES_INCREMENT)
-0024                  00102         MINUTES_INCREMENT:
-0024   0A??           00103             INCF minutes, f                     ; Circular increment of minutes.        
-0025   08??           00104             MOVF minutes, 0
-0026   3C3C           00105             SUBLW .60
-0027   1D03           00106             BTFSS STATUS, Z
-0028   2???           00107             GOTO POP
-0029   3000           00108             MOVLW .0
-002A   00??           00109             MOVWF minutes
-                      00110         
+0034                  00125         MINUTES_INCREMENT:
+0034   0A??           00126             INCF minutes, f                     ; Circular increment of minutes.        
+0035   08??           00127             MOVF minutes, 0
+0036   3C3C           00128             SUBLW .60
+0037   1D03           00129             BTFSS STATUS, Z
+0038   2???           00130             GOTO POP
+0039   3000           00131             MOVLW .0
+003A   00??           00132             MOVWF minutes
+MPASM 5.65                         RELOJ.ASM   2-29-2016  22:57:42         PAGE  4
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+                      00133         
 Warning[207]: Found label after column 1. (HOURS_DISPLAY)
-002B                  00111         HOURS_DISPLAY:
-                      00112          ;   BTFSC PORTA, 2
-                      00113           ;  GOTO hour_hand_on
-                      00114            ; BSF PORTA, 2
-                      00115             ;GOTO HOURS_INCREMENT
-                      00116             ;hour_hand_on:
-                      00117         ;       BCF PORTA, 2
-                      00118         
+003B                  00134         HOURS_DISPLAY:
+                      00135          ;   BTFSC PORTA, 2
+                      00136           ;  GOTO hour_hand_on
+                      00137            ; BSF PORTA, 2
+                      00138             ;GOTO HOURS_INCREMENT
+                      00139             ;hour_hand_on:
+                      00140         ;       BCF PORTA, 2
+                      00141         
 Warning[207]: Found label after column 1. (HOURS_INCREMENT)
-002B                  00119         HOURS_INCREMENT:
-002B   0A??           00120             INCF hours, f                       ; Circular increment of hours.
-002C   08??           00121             MOVF hours, 0
-002D   3C18           00122             SUBLW .24
-002E   1D03           00123             BTFSS STATUS, Z
-002F   2???           00124             GOTO POP
-0030   3000           00125             MOVLW .0
-0031   00??           00126             MOVWF hours
-                      00127 ;*******EXIT INTERRUPT VECTOR***********************************************        
+003B                  00142         HOURS_INCREMENT:
+003B   0A??           00143             INCF hours, f                       ; Circular increment of hours.
+003C   08??           00144             MOVF hours, 0
+003D   3C18           00145             SUBLW .24
+003E   1D03           00146             BTFSS STATUS, Z
+003F   2???           00147             GOTO POP
+0040   3000           00148             MOVLW .0
+0041   00??           00149             MOVWF hours
+                      00150 ;*******EXIT INTERRUPT VECTOR***********************************************        
 Warning[207]: Found label after column 1. (POP)
-0032                  00128     POP:
-0032   1283           00129         bcf     STATUS,RP0        ; ensure file register bank set to 0
-0033   0822           00130         movf    pclath_temp,w     ; retrieve copy of PCLATH register
-0034   008A           00131         movwf   PCLATH            ; restore pre-isr PCLATH register contents
-0035   0821           00132         movf    status_temp,w     ; retrieve copy of STATUS register
-0036   0083           00133         movwf   STATUS            ; restore pre-isr STATUS register contents
-MPASM 5.65                         RELOJ.ASM   2-29-2016  19:49:09         PAGE  4
-
-
-LOC  OBJECT CODE     LINE SOURCE TEXT
-  VALUE
-
-0037   0EA0           00134         swapf   w_temp,f
-0038   0E20           00135         swapf   w_temp,w          ; restore pre-isr W register contents
-0039   0009           00136         RETFIE
-                      00137 ;*******************************************************************************
-                      00138     
-003A                  00139 SETUP:
-003A   1683           00140     BSF STATUS, RP0             ; Bank select 1
-Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
-003B   0185           00141     CLRF TRISA       
-Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
-003C   0186           00142     CLRF TRISB       
-003D   30F0           00143     MOVLW b'11110000'
-Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
-003E   0086           00144     MOVWF TRISB
-Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
-003F   0185           00145     CLRF TRISA
-0040   30A8           00146     MOVLW b'10101000'
-0041   008B           00147     MOVWF INTCON
-                      00148             
-Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
-0042   1281           00149     BCF OPTION_REG, T0CS        ; TMR0 CLOCK SOURCE: INTERNAL INSTRUCTION CYCLE CLOCK
-Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
-0043   1181           00150     BCF OPTION_REG, PSA         ; PRESCALER ASSIGNMENT: TIMER0 MODULE
-Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
-0044   1501           00151     BSF OPTION_REG, PS2         ; PRESCALER RATE: 1:256
-Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
-0045   1481           00152     BSF OPTION_REG, PS1         ; PRESCALER RATE: 1:256
-Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
-0046   1401           00153     BSF OPTION_REG, PS0         ; PRESCALER RATE: 1:256
-                      00154 
-0047   1283           00155     BCF STATUS, RP0             ; bank select 1 
-0048   0185           00156     CLRF PORTA                  
-0049   0186           00157     CLRF PORTB
-                      00158     
-004A   3028           00159     MOVLW .40                   ; For TMR0 delay of 1000ms 
-004B   00??           00160     MOVWF delay_counter
+0042                  00151     POP:
+0042   1283           00152         bcf     STATUS,RP0        ; ensure file register bank set to 0
+0043   0822           00153         movf    pclath_temp,w     ; retrieve copy of PCLATH register
+0044   008A           00154         movwf   PCLATH            ; restore pre-isr PCLATH register contents
+0045   0821           00155         movf    status_temp,w     ; retrieve copy of STATUS register
+0046   0083           00156         movwf   STATUS            ; restore pre-isr STATUS register contents
+0047   0EA0           00157         swapf   w_temp,f
+0048   0E20           00158         swapf   w_temp,w          ; restore pre-isr W register contents
+0049   0009           00159         RETFIE
+                      00160 ;*******************************************************************************
                       00161     
-004C   300F           00162     MOVLW .15                   ; Initial time.
-004D   00??           00163     MOVWF seconds
-004E   00??           00164     MOVWF minutes
-004F   00??           00165     MOVWF hours
-                      00166     
-                      00167 
-                      00168     
-0050                  00169 MAINPROGRAM:
-0050   2???           00170     CALL SPLIT_SECONDS          ; Call to get HH:MM:SS
-0051   2???           00171     CALL SPLIT_MINUTES
-0052   2???           00172     CALL SPLIT_HOURS
-0053   08??           00173     MOVF minutes_u, 0
-0054   0085           00174     MOVWF PORTA
-0055   2???           00175     GOTO MAINPROGRAM            ; Unconditional loop.
-                      00176     
-0056                  00177 SPLIT_SECONDS:                          ; Splits digits.
-MPASM 5.65                         RELOJ.ASM   2-29-2016  19:49:09         PAGE  5
+004A                  00162 SETUP:
+004A   1683           00163     BSF STATUS, RP0             ; Bank select 1
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+004B   0185           00164     CLRF TRISA       
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+004C   0186           00165     CLRF TRISB       
+004D   30F0           00166     MOVLW b'11110000'
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+004E   0086           00167     MOVWF TRISB
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+004F   0185           00168     CLRF TRISA
+0050   30A8           00169     MOVLW b'10101000'           ; Enables interrupts from TMR0 an RB (IOC).
+0051   008B           00170     MOVWF INTCON
+                      00171             
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+0052   1281           00172     BCF OPTION_REG, T0CS        ; TMR0 CLOCK SOURCE: INTERNAL INSTRUCTION CYCLE CLOCK
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+0053   1181           00173     BCF OPTION_REG, PSA         ; PRESCALER ASSIGNMENT: TIMER0 MODULE
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+0054   1501           00174     BSF OPTION_REG, PS2         ; PRESCALER RATE: 1:256
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+MPASM 5.65                         RELOJ.ASM   2-29-2016  22:57:42         PAGE  5
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
   VALUE
 
-0056   08??           00178     MOVF seconds, 0         
-0057   00??           00179     MOVWF seconds_u
-0058   01??           00180     CLRF seconds_t
+0055   1481           00175     BSF OPTION_REG, PS1         ; PRESCALER RATE: 1:256
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+0056   1401           00176     BSF OPTION_REG, PS0         ; PRESCALER RATE: 1:256
+                      00177 
+0057   1283           00178     BCF STATUS, RP0             ; bank select 1 
+0058   0185           00179     CLRF PORTA                  
+0059   0186           00180     CLRF PORTB
+                      00181     
+005A   3028           00182     MOVLW .40                   ; For TMR0 delay of 1000ms 
+005B   00??           00183     MOVWF delay_counter
+                      00184     
+005C   300F           00185     MOVLW .15                   ; Initial time.
+005D   00??           00186     MOVWF seconds
+005E   00??           00187     MOVWF minutes
+005F   00??           00188     MOVWF hours
+                      00189     
+0060   01??           00190     CLRF alarm_minutes
+0061   01??           00191     CLRF alarm_hours
+0062   01??           00192     CLRF alarm_status           ;To determine whether alarm is ON/OFF or in SET mode.
+                      00193                                 ;  Bit  |   State   |   Mode
+                      00194                                 ;   0   |     S     |   Set
+                      00195                                 ;       |     C     |   Run
+                      00196                                 ;   1   |     S     |   Alarm ON
+                      00197                                 ;       |     C     |   Alarm OFF
+0063                  00198 MAINPROGRAM:
+0063   2???           00199     CALL SPLIT_SECONDS          ; Call to get HH:MM:SS
+0064   2???           00200     CALL SPLIT_MINUTES
+0065   2???           00201     CALL SPLIT_HOURS
+0066   08??           00202     MOVF alarm_status, 0
+0067   0085           00203     MOVWF PORTA
+0068   2???           00204     GOTO MAINPROGRAM            ; Unconditional loop.
+                      00205     
+0069                  00206 SPLIT_SECONDS:                          ; Splits digits.
+0069   08??           00207     MOVF seconds, 0         
+006A   00??           00208     MOVWF seconds_u
+006B   01??           00209     CLRF seconds_t
 Warning[207]: Found label after column 1. (SPLIT_SECONDS_LOOP)
-0059                  00181     SPLIT_SECONDS_LOOP:                 ; Succesive substraction algorithm.
-0059   300A           00182         MOVLW .10
-005A   02??           00183         SUBWF seconds_u, f
-005B   1903           00184         BTFSC STATUS, Z                 ; Check for zero in result. 
-005C   2???           00185         GOTO SPLIT_SECONDS_ZERO
-005D   1C03           00186         BTFSS STATUS, C                 ; Check for underflow.
-005E   2???           00187         GOTO SPLIT_SECONDS_BORROW
+006C                  00210     SPLIT_SECONDS_LOOP:                 ; Succesive substraction algorithm.
+006C   300A           00211         MOVLW .10
+006D   02??           00212         SUBWF seconds_u, f
+006E   1903           00213         BTFSC STATUS, Z                 ; Check for zero in result. 
+006F   2???           00214         GOTO SPLIT_SECONDS_ZERO
+0070   1C03           00215         BTFSS STATUS, C                 ; Check for underflow.
+0071   2???           00216         GOTO SPLIT_SECONDS_BORROW
 Message[305]: Using default destination of 1 (file).
-005F   0A??           00188         INCF seconds_t                  ; If none of the above -> increment.
-0060   2???           00189         GOTO SPLIT_SECONDS_LOOP         ; Loop.
+0072   0A??           00217         INCF seconds_t                  ; If none of the above -> increment.
+0073   2???           00218         GOTO SPLIT_SECONDS_LOOP         ; Loop.
 Warning[207]: Found label after column 1. (SPLIT_SECONDS_ZERO)
-0061                  00190     SPLIT_SECONDS_ZERO:
-0061   0A??           00191         INCF seconds_t, f               ; Increment and exit.
-0062   0008           00192         RETURN
+0074                  00219     SPLIT_SECONDS_ZERO:
+0074   0A??           00220         INCF seconds_t, f               ; Increment and exit.
+0075   0008           00221         RETURN
 Warning[207]: Found label after column 1. (SPLIT_SECONDS_BORROW)
-0063                  00193     SPLIT_SECONDS_BORROW:
-0063   300A           00194         MOVLW .10                       ; Restore original value and exit.
-0064   07??           00195         ADDWF seconds_u, f
-0065   0008           00196         RETURN
-                      00197 
-0066                  00198 SPLIT_MINUTES:
-0066   08??           00199     MOVF minutes, 0
-0067   00??           00200     MOVWF minutes_u
-0068   01??           00201     CLRF minutes_t
-Warning[207]: Found label after column 1. (SPLIT_MINUTES_LOOP)
-0069                  00202     SPLIT_MINUTES_LOOP:
-0069   300A           00203         MOVLW .10
-006A   02??           00204         SUBWF minutes_u, f
-006B   1903           00205         BTFSC STATUS, Z
-006C   2???           00206         GOTO SPLIT_MINUTES_ZERO
-006D   1C03           00207         BTFSS STATUS, C
-006E   2???           00208         GOTO SPLIT_MINUTES_BORROW
-Message[305]: Using default destination of 1 (file).
-006F   0A??           00209         INCF minutes_t
-0070   2???           00210         GOTO SPLIT_MINUTES_LOOP
-Warning[207]: Found label after column 1. (SPLIT_MINUTES_ZERO)
-0071                  00211     SPLIT_MINUTES_ZERO:
-0071   0A??           00212         INCF minutes_t, f 
-0072   0008           00213         RETURN
-Warning[207]: Found label after column 1. (SPLIT_MINUTES_BORROW)
-0073                  00214     SPLIT_MINUTES_BORROW:
-0073   300A           00215         MOVLW .10
-0074   07??           00216         ADDWF minutes_u, f
-0075   0008           00217         RETURN
-                      00218         
-0076                  00219 SPLIT_HOURS:
-0076   08??           00220     MOVF hours, 0
-0077   00??           00221     MOVWF hours_u
-0078   01??           00222     CLRF hours_t
-MPASM 5.65                         RELOJ.ASM   2-29-2016  19:49:09         PAGE  6
+0076                  00222     SPLIT_SECONDS_BORROW:
+MPASM 5.65                         RELOJ.ASM   2-29-2016  22:57:42         PAGE  6
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
   VALUE
 
-Warning[207]: Found label after column 1. (SPLIT_HOURS_LOOP)
-0079                  00223     SPLIT_HOURS_LOOP:
-0079   300A           00224         MOVLW .10
-007A   02??           00225         SUBWF hours_u, f
-007B   1903           00226         BTFSC STATUS, Z
-007C   2???           00227         GOTO SPLIT_HOURS_ZERO
-007D   1C03           00228         BTFSS STATUS, C
-007E   2???           00229         GOTO SPLIT_HOURS_BORROW
+0076   300A           00223         MOVLW .10                       ; Restore original value and exit.
+0077   07??           00224         ADDWF seconds_u, f
+0078   0008           00225         RETURN
+                      00226 
+0079                  00227 SPLIT_MINUTES:
+0079   08??           00228     MOVF minutes, 0
+007A   00??           00229     MOVWF minutes_u
+007B   01??           00230     CLRF minutes_t
+Warning[207]: Found label after column 1. (SPLIT_MINUTES_LOOP)
+007C                  00231     SPLIT_MINUTES_LOOP:
+007C   300A           00232         MOVLW .10
+007D   02??           00233         SUBWF minutes_u, f
+007E   1903           00234         BTFSC STATUS, Z
+007F   2???           00235         GOTO SPLIT_MINUTES_ZERO
+0080   1C03           00236         BTFSS STATUS, C
+0081   2???           00237         GOTO SPLIT_MINUTES_BORROW
 Message[305]: Using default destination of 1 (file).
-007F   0A??           00230         INCF hours_t
-0080   2???           00231         GOTO SPLIT_HOURS_LOOP
+0082   0A??           00238         INCF minutes_t
+0083   2???           00239         GOTO SPLIT_MINUTES_LOOP
+Warning[207]: Found label after column 1. (SPLIT_MINUTES_ZERO)
+0084                  00240     SPLIT_MINUTES_ZERO:
+0084   0A??           00241         INCF minutes_t, f 
+0085   0008           00242         RETURN
+Warning[207]: Found label after column 1. (SPLIT_MINUTES_BORROW)
+0086                  00243     SPLIT_MINUTES_BORROW:
+0086   300A           00244         MOVLW .10
+0087   07??           00245         ADDWF minutes_u, f
+0088   0008           00246         RETURN
+                      00247         
+0089                  00248 SPLIT_HOURS:
+0089   08??           00249     MOVF hours, 0
+008A   00??           00250     MOVWF hours_u
+008B   01??           00251     CLRF hours_t
+Warning[207]: Found label after column 1. (SPLIT_HOURS_LOOP)
+008C                  00252     SPLIT_HOURS_LOOP:
+008C   300A           00253         MOVLW .10
+008D   02??           00254         SUBWF hours_u, f
+008E   1903           00255         BTFSC STATUS, Z
+008F   2???           00256         GOTO SPLIT_HOURS_ZERO
+0090   1C03           00257         BTFSS STATUS, C
+0091   2???           00258         GOTO SPLIT_HOURS_BORROW
+Message[305]: Using default destination of 1 (file).
+0092   0A??           00259         INCF hours_t
+0093   2???           00260         GOTO SPLIT_HOURS_LOOP
 Warning[207]: Found label after column 1. (SPLIT_HOURS_ZERO)
-0081                  00232     SPLIT_HOURS_ZERO:
-0081   0A??           00233         INCF hours_t, f 
-0082   0008           00234         RETURN
+0094                  00261     SPLIT_HOURS_ZERO:
+0094   0A??           00262         INCF hours_t, f 
+0095   0008           00263         RETURN
 Warning[207]: Found label after column 1. (SPLIT_HOURS_BORROW)
-0083                  00235     SPLIT_HOURS_BORROW:
-0083   300A           00236         MOVLW .10
-0084   07??           00237         ADDWF hours_u, f
-0085   0008           00238         RETURN
-                      00239         
+0096                  00264     SPLIT_HOURS_BORROW:
+0096   300A           00265         MOVLW .10
+0097   07??           00266         ADDWF hours_u, f
+0098   0008           00267         RETURN
+MPASM 5.65                         RELOJ.ASM   2-29-2016  22:57:42         PAGE  7
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+                      00268         
 Warning[205]: Found directive in column 1. (END)
-3FF1                  00240 END
-MPASM 5.65                         RELOJ.ASM   2-29-2016  19:49:09         PAGE  7
+3FF1                  00269 END
+MPASM 5.65                         RELOJ.ASM   2-29-2016  22:57:42         PAGE  8
 
 
 SYMBOL TABLE
   LABEL                             VALUE 
 
 C                                 00000000
-CHECK_HOURS_INC                   0000001A
-CHECK_MINUTES_INC                 00000018
+CHECK_ALARM_STATE                 00000020
+CHECK_HOURS_INC                   0000002A
+CHECK_MINUTES_INC                 00000028
+CHECK_MODE                        00000018
 DC                                00000001
 EEADR                             00000009
 EECON1                            00000088
@@ -341,24 +382,24 @@ EEIF                              00000004
 F                                 00000001
 FSR                               00000004
 GIE                               00000007
-HOURS_DISPLAY                     0000002B
-HOURS_INCREMENT                   0000002B
+HOURS_DISPLAY                     0000003B
+HOURS_INCREMENT                   0000003B
 INDF                              00000000
 INTCON                            0000000B
 INTE                              00000004
 INTEDG                            00000006
 INTF                              00000001
 IRP                               00000007
-MAINPROGRAM                       00000050
-MINUTES_DISPLAY                   00000024
-MINUTES_INCREMENT                 00000024
+MAINPROGRAM                       00000063
+MINUTES_DISPLAY                   00000034
+MINUTES_INCREMENT                 00000034
 NOT_PD                            00000003
 NOT_RBPU                          00000007
 NOT_TO                            00000004
 OPTION_REG                        00000081
 PCL                               00000002
 PCLATH                            0000000A
-POP                               00000032
+POP                               00000042
 PORTA                             00000005
 PORTB                             00000006
 PS0                               00000000
@@ -379,33 +420,33 @@ RB4                               00000004
 RB5                               00000005
 RB6                               00000006
 RB7                               00000007
-RBI                               00000015
-RBIE                              00000003
-MPASM 5.65                         RELOJ.ASM   2-29-2016  19:49:09         PAGE  8
+MPASM 5.65                         RELOJ.ASM   2-29-2016  22:57:42         PAGE  9
 
 
 SYMBOL TABLE
   LABEL                             VALUE 
 
+RBI                               00000015
+RBIE                              00000003
 RBIF                              00000000
 RD                                00000000
 RP0                               00000005
 RP1                               00000006
-SECONDS_DISPLAY                   0000001D
-SECONDS_INCREMENT                 0000001D
-SETUP                             0000003A
-SPLIT_HOURS                       00000076
-SPLIT_HOURS_BORROW                00000083
-SPLIT_HOURS_LOOP                  00000079
-SPLIT_HOURS_ZERO                  00000081
-SPLIT_MINUTES                     00000066
-SPLIT_MINUTES_BORROW              00000073
-SPLIT_MINUTES_LOOP                00000069
-SPLIT_MINUTES_ZERO                00000071
-SPLIT_SECONDS                     00000056
-SPLIT_SECONDS_BORROW              00000063
-SPLIT_SECONDS_LOOP                00000059
-SPLIT_SECONDS_ZERO                00000061
+SECONDS_DISPLAY                   0000002D
+SECONDS_INCREMENT                 0000002D
+SETUP                             0000004A
+SPLIT_HOURS                       00000089
+SPLIT_HOURS_BORROW                00000096
+SPLIT_HOURS_LOOP                  0000008C
+SPLIT_HOURS_ZERO                  00000094
+SPLIT_MINUTES                     00000079
+SPLIT_MINUTES_BORROW              00000086
+SPLIT_MINUTES_LOOP                0000007C
+SPLIT_MINUTES_ZERO                00000084
+SPLIT_SECONDS                     00000069
+SPLIT_SECONDS_BORROW              00000076
+SPLIT_SECONDS_LOOP                0000006C
+SPLIT_SECONDS_ZERO                00000074
 STATUS                            00000003
 T0CS                              00000005
 T0IE                              00000005
@@ -438,14 +479,14 @@ _CONFIG                           00002007
 _CP_OFF                           00003FFF
 _CP_ON                            0000000F
 _DEVID1                           00002006
-_FOSC_EXTRC                       00003FFF
-_FOSC_HS                          00003FFE
-MPASM 5.65                         RELOJ.ASM   2-29-2016  19:49:09         PAGE  9
+MPASM 5.65                         RELOJ.ASM   2-29-2016  22:57:42         PAGE 10
 
 
 SYMBOL TABLE
   LABEL                             VALUE 
 
+_FOSC_EXTRC                       00003FFF
+_FOSC_HS                          00003FFE
 _FOSC_LP                          00003FFC
 _FOSC_XT                          00003FFD
 _HS_OSC                           00003FFE
@@ -465,6 +506,9 @@ _XT_OSC                           00003FFD
 __16F84A                          00000001
 alarm_hours                       00000017
 alarm_minutes                     00000016
+alarm_on                          00000026
+alarm_setting                     0000001E
+alarm_status                      00000018
 delay_counter                     0000000C
 hours                             00000013
 hours_t                           00000014
@@ -481,7 +525,7 @@ w_temp                            00000020
 w_temp1                           000000A0
 
 Errors   :     0
-Warnings :    26 reported,     0 suppressed
+Warnings :    30 reported,     0 suppressed
 Messages :    12 reported,     0 suppressed
 
 
