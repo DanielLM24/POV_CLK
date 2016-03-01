@@ -65,7 +65,7 @@ ORG 0x0004
 	BCF INTCON, RBIF	    ; Interrupt flag clear.
 	
 	CHECK_MODE:
-	    BTFSS PORTB, RB6
+	    BTFSC PORTB, RB6
 	    GOTO CHECK_ALARM_STATE
 	    BTFSC alarm_status, 0	    ; Check clock mode (Alarm Set/Run)		
 	    GOTO alarm_setting	
@@ -76,7 +76,7 @@ ORG 0x0004
 	    GOTO POP
 	
 	CHECK_ALARM_STATE:
-	    BTFSS PORTB, RB7	    
+	    BTFSC PORTB, RB7	    
 	    GOTO CHECK_MINUTES_INC
 	    BTFSC alarm_status, 1   ; Check alarm status (ON/OFF)		
 	    GOTO alarm_on	
@@ -93,10 +93,7 @@ ORG 0x0004
 	    BTFSC PORTB, RB5
 	    GOTO HOURS_INCREMENT
 	    GOTO POP
-	
-	   
-	    
-	
+		
 	SECONDS_DISPLAY:
 	;    BTFSC PORTA,0		
 	 ;   GOTO second_hand_on	
