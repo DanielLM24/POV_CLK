@@ -18,6 +18,7 @@ w_temp1		EQU	0xA0		; reserve bank1 equivalent of w_temp
 status_temp	EQU	0x21		; variable used for context saving
 pclath_temp	EQU	0x22		; variable used for context saving
 delay_counter	res 1			; For one second delay.
+delay_counter_1 res 1			
 seconds		res 1			; Variables for time storage.
 seconds_t	res 1	
 seconds_u	res 1
@@ -30,6 +31,12 @@ hours_u		res 1
 alarm_minutes	res 1			; Variables for alarm setting.
 alarm_hours	res 1
 alarm_status	res 1	
+column_counter	res 1
+column_index	res 1
+stripe_1	res 1
+stripe_2	res 1
+stripe_3	res 1
+stripe_4	res 1
 ;*******************************************************************************
 ORG 0x0000
     NOP
@@ -48,14 +55,46 @@ ORG 0x0004
 	BTFSS INTCON, T0IF	  ; Check T0IF.
         GOTO RBI		  ; Exit interrupt vector. 
 	BCF INTCON, T0IF
-	MOVLW .61		  ; Pre-load TMR0
+	MOVLW .251		  ; Pre-load TMR0
 	MOVWF TMR0
+	
+		COLUMN_COUNTER_CONTROL:
+	    MOVF column_counter, 0
+	    SUBLW .120
+	    BTFSS STATUS, Z
+	    GOTO COUNTER_INCREMENT
+	    GOTO COUNTER_RESET
+	    COUNTER_INCREMENT:
+		INCF column_counter, 1
+		GOTO COLUMN_INDEX_CONTROL
+	    COUNTER_RESET:
+		MOVLW .1
+		MOVWF column_counter
+		
+	COLUMN_INDEX_CONTROL:
+	    MOVF column_index, 0
+	    SUBLW .5
+	    BTFSS STATUS, Z
+	    GOTO INDEX_INCREMENT
+	    GOTO INDEX_RESET
+	    INDEX_INCREMENT:
+		INCF column_index, 1
+		GOTO SECONDS_CONTROL
+	    INDEX_RESET:
+		MOVLW .1
+		MOVWF column_index
 
+	SECONDS_CONTROL:
 	DECFSZ delay_counter, 1	  ; 1 second has passed.
 	GOTO POP
 	
-	MOVLW .40		    ; For 1 second delay.
-	MOVWF delay_counter	
+	MOVLW .223		    ; For 1 second delay.
+	MOVWF delay_counter
+	DECFSZ delay_counter_1, 1
+	GOTO POP
+	
+	MOVLW .7
+	MOVWF delay_counter_1
 	GOTO SECONDS_INCREMENT
 	
     RBI:
@@ -196,13 +235,19 @@ SETUP:
     CLRF PORTA			
     CLRF PORTB
     
-    MOVLW .40			; For TMR0 delay of 1000ms 
+    MOVLW .223			; For TMR0 delay of 1000ms 
     MOVWF delay_counter
+    MOVLW .7
+    MOVWF delay_counter_1
     
     MOVLW .15			; Initial time.
     MOVWF seconds
     MOVWF minutes
     MOVWF hours
+    
+    MOVLW .1
+    MOVWF column_counter
+    MOVWF column_index
     
     CLRF alarm_minutes
     CLRF alarm_hours
@@ -217,10 +262,7 @@ MAINPROGRAM:
     CALL SPLIT_MINUTES
     CALL SPLIT_HOURS
     CALL CHECK_ALARM
-    MOVF hours, 0
-    MOVWF PORTB
-    MOVF alarm_status, 0
-    MOVWF PORTA
+    
     GOTO MAINPROGRAM		; Unconditional loop.
     
 SPLIT_SECONDS:				; Splits digits.
