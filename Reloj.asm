@@ -50,7 +50,6 @@ ORG 0x0004
 	BCF INTCON, T0IF
 	MOVLW .61		  ; Pre-load TMR0
 	MOVWF TMR0
-	BSF INTCON, RBIE	
 
 	DECFSZ delay_counter, 1	  ; 1 second has passed.
 	GOTO POP
@@ -63,7 +62,6 @@ ORG 0x0004
 	BTFSS INTCON, RBIF	    ; Interrupt not caused by button press.
 	GOTO POP
 	BCF INTCON, RBIF	    ; Interrupt flag clear.
-	
 	CHECK_MODE:
 	    BTFSC PORTB, RB6
 	    GOTO CHECK_ALARM_STATE
@@ -219,6 +217,10 @@ MAINPROGRAM:
     CALL SPLIT_MINUTES
     CALL SPLIT_HOURS
     CALL CHECK_ALARM
+    MOVF hours, 0
+    MOVWF PORTB
+    MOVF alarm_status, 0
+    MOVWF PORTA
     GOTO MAINPROGRAM		; Unconditional loop.
     
 SPLIT_SECONDS:				; Splits digits.
@@ -284,7 +286,7 @@ SPLIT_HOURS:
 	ADDWF hours_u, f
 	RETURN
 	
-ALARM_CHECK:
+CHECK_ALARM:
     BTFSS alarm_status, 1   ;Alarm ON or OFF?
     RETURN
     MOVF minutes, 0
