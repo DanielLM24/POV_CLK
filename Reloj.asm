@@ -57,7 +57,7 @@ ORG 0x0004
 	BTFSS INTCON, T0IF	  ; Check T0IF.
         GOTO RBI		  ; Exit interrupt vector. 
 	BCF INTCON, T0IF
-	MOVLW .251		  ; Pre-load TMR0
+	MOVLW .246		  ; Pre-load TMR0
 	MOVWF TMR0
 	
     COLUMN_COUNTER_CONTROL:
@@ -75,7 +75,7 @@ ORG 0x0004
 		
 	COLUMN_INDEX_CONTROL:
 	    MOVF column_index, 0
-	    SUBLW .120
+	    SUBLW .60
 	    BTFSS STATUS, Z
 	    GOTO INDEX_INCREMENT
 	    GOTO INDEX_RESET
@@ -90,7 +90,7 @@ ORG 0x0004
 	DECFSZ delay_counter, 1	  ; 1 second has passed.
 	GOTO POP
 	
-	MOVLW .223		    ; For 1 second delay.
+	MOVLW .112		    ; For 1 second delay.
 	MOVWF delay_counter
 	DECFSZ delay_counter_1, 1
 	GOTO POP
@@ -275,88 +275,171 @@ MAINPROGRAM:
    SUBLW .4
    BTFSC STATUS, C
    CALL display_hours_t
+   
    MOVF column_index, 0
-   SUBLW .4
-   BTFSC STATUS, Z
-   CALL display_hours_t
+   SUBLW .5
+   BTFSS STATUS, Z
+   GOTO CHECK_HOURS_U
+   CLRF PORTA
+   CLRF PORTB 
+   GOTO EXIT
+   
+   ;INDEX=5
+   ;	clrf porta
+   ;	CLRF PORTB
+   ;	GOTO EXIT
    
    CHECK_HOURS_U:
    MOVF column_index, 0
-   SUBLW .6
-   BTFSC STATUS, Z
-   CALL display_hours_u
-   MOVF column_index, 0
-   SUBLW .9
-   BTFSC STATUS, Z
-   CALL display_hours_u
-   MOVF column_index, 0
    SUBLW .9
    BTFSC STATUS, C
-   GOTO CHECK_MINUTES_T
+   GOTO SMALLER_EQUAL_9
+   GOTO EMPTY_SPACE_2
+   SMALLER_EQUAL_9:
+   MOVF column_index, 0
+   SUBLW .6
+   BTFSC STATUS, C
+   GOTO EQUAL_6
    CALL display_hours_u
+   GOTO EMPTY_SPACE_2
+   EQUAL_6:
+   MOVF column_index, 0
+   SUBLW .6
+   BTFSS STATUS, Z
+   GOTO EMPTY_SPACE_2
+   CALL display_hours_u
+   
+   
+   EMPTY_SPACE_2:   
+   MOVF column_index, 0
+   SUBLW .10
+   BTFSS STATUS, Z
+   GOTO CHECK_MINUTES_T
+   CLRF PORTA
+   CLRF PORTB 
+   GOTO EXIT
    
    CHECK_MINUTES_T:
+    MOVF column_index, 0
+    SUBLW .14
+    BTFSC STATUS, C
+    GOTO SMALLER_EQUAL_14
+    GOTO EMPTY_SPACE_3
+   SMALLER_EQUAL_14:
+    MOVF column_index, 0
+    SUBLW .11
+    BTFSC STATUS, C
+    GOTO EQUAL_11
+    CALL display_minutes_t
+    GOTO EMPTY_SPACE_3
+   EQUAL_11:
+    MOVF column_index, 0
+    SUBLW .11
+    BTFSS STATUS, Z
+    GOTO EMPTY_SPACE_3
+    CALL display_minutes_t
+   
+   EMPTY_SPACE_3:
    MOVF column_index, 0
-   SUBLW .11
-   BTFSC STATUS, Z
-   CALL display_minutes_t
-   MOVF column_index, 0
-   SUBLW .14
-   BTFSC STATUS, Z
-   CALL display_minutes_t
-   MOVF column_index, 0
-   SUBLW .14
-   BTFSC STATUS, C
+   SUBLW .15
+   BTFSS STATUS, Z
    GOTO CHECK_MINUTES_U
-   CALL display_minutes_t
+   CLRF PORTA
+   CLRF PORTB 
+   GOTO EXIT
    
    CHECK_MINUTES_U:
+    MOVF column_index, 0
+    SUBLW .19
+    BTFSC STATUS, C
+    GOTO SMALLER_EQUAL_19
+    GOTO EMPTY_SPACE_4
+   SMALLER_EQUAL_19:
+    MOVF column_index, 0
+    SUBLW .16
+    BTFSC STATUS, C
+    GOTO EQUAL_16
+    CALL display_minutes_u
+    GOTO EMPTY_SPACE_4
+   EQUAL_16:
+    MOVF column_index, 0
+    SUBLW .16
+    BTFSS STATUS, Z
+    GOTO EMPTY_SPACE_4
+    CALL display_minutes_u
+   
+   EMPTY_SPACE_4:
    MOVF column_index, 0
-   SUBLW .16
-   BTFSC STATUS, Z
-   CALL display_minutes_u
-   MOVF column_index, 0
-   SUBLW .19
-   BTFSC STATUS, Z
-   CALL display_minutes_u
-   MOVF column_index, 0
-   SUBLW .19
-   BTFSC STATUS, C
+   SUBLW .20
+   BTFSS STATUS, Z
    GOTO CHECK_SECONDS_T
-   CALL display_minutes_u
+   CLRF PORTA
+   CLRF PORTB 
+   GOTO EXIT
    
    CHECK_SECONDS_T:
+    MOVF column_index, 0
+    SUBLW .24
+    BTFSC STATUS, C
+    GOTO SMALLER_EQUAL_24
+    GOTO EMPTY_SPACE_5
+   SMALLER_EQUAL_24:
+    MOVF column_index, 0
+    SUBLW .21
+    BTFSC STATUS, C
+    GOTO EQUAL_21
+    CALL display_seconds_t
+    GOTO EMPTY_SPACE_5
+   EQUAL_21:
+    MOVF column_index, 0
+    SUBLW .21
+    BTFSS STATUS, Z
+    GOTO EMPTY_SPACE_5
+    CALL display_seconds_t
+    
+   EMPTY_SPACE_5:
    MOVF column_index, 0
-   SUBLW .21
-   BTFSC STATUS, Z
-   CALL display_seconds_t
-   MOVF column_index, 0
-   SUBLW .24
-   BTFSC STATUS, Z
-   CALL display_seconds_t
-   MOVF column_index, 0
-   SUBLW .24
-   BTFSC STATUS, C
+   SUBLW .25
+   BTFSS STATUS, Z
    GOTO CHECK_SECONDS_U
-   CALL display_seconds_t
+   CLRF PORTA
+   CLRF PORTB 
+   GOTO EXIT
    
    CHECK_SECONDS_U:
+    MOVF column_index, 0
+    SUBLW .29
+    BTFSC STATUS, C
+    GOTO SMALLER_EQUAL_29
+    GOTO EMPTY_SPACE_6
+   SMALLER_EQUAL_29:
+    MOVF column_index, 0
+    SUBLW .26
+    BTFSC STATUS, C
+    GOTO EQUAL_26
+    CALL display_seconds_u
+    GOTO EMPTY_SPACE_6
+   EQUAL_26:
+    MOVF column_index, 0
+    SUBLW .26
+    BTFSS STATUS, Z
+    GOTO EMPTY_SPACE_6
+    CALL display_seconds_u
+   
+   EMPTY_SPACE_6:
    MOVF column_index, 0
-   SUBLW .26
-   BTFSC STATUS, Z
-   CALL display_seconds_u
-   MOVF column_index, 0
-   SUBLW .29
-   BTFSC STATUS, Z
-   CALL display_seconds_u
-   MOVF column_index, 0
-   SUBLW .29
-   BTFSC STATUS, C
-   GOTO EXIT
-   CALL display_seconds_u
-   EXIT:
+   SUBLW .30
+   BTFSS STATUS, Z
+   GOTO HALF_OFF
    CLRF PORTA
-   CLRF PORTB
+   CLRF PORTB 
+   GOTO EXIT
+   
+   HALF_OFF:
+    CLRF PORTA
+    CLRF PORTB
+
+EXIT:
 GOTO MAINPROGRAM		; Unconditional loop.
     
 SPLIT_SECONDS:				; Splits digits.
@@ -792,6 +875,93 @@ ONE:
     MOVLW .255
     MOVWF stripe_4
     RETURN
+    
+TWO:
+    MOVLW b'01000011'
+    MOVWF stripe_1
+    MOVLW b'10000101'
+    MOVWF stripe_2
+    MOVLW b'10001001'
+    MOVWF stripe_3
+    MOVLW b'01110001'
+    MOVWF stripe_4
+    RETURN
+    
+THREE:
+    MOVLW b'01000010'
+    MOVWF stripe_1
+    MOVLW b'10000001'
+    MOVWF stripe_2
+    MOVLW b'10010001'
+    MOVWF stripe_3
+    MOVLW b'01101110'
+    MOVWF stripe_4
+    RETURN
+
+FOUR:
+    MOVLW b'11111000'
+    MOVWF stripe_1
+    MOVLW b'00001000'
+    MOVWF stripe_2
+    MOVLW b'00111111'
+    MOVWF stripe_3
+    MOVLW b'00001000'
+    MOVWF stripe_4
+    RETURN
+    
+FIVE:
+    MOVLW b'11111010'
+    MOVWF stripe_1
+    MOVLW b'10010001'
+    MOVWF stripe_2
+    MOVLW b'10010001'
+    MOVWF stripe_3
+    MOVLW b'10001110'
+    MOVWF stripe_4
+    RETURN
+
+SIX:
+    MOVLW b'00011110'
+    MOVWF stripe_1
+    MOVLW b'00110001'
+    MOVWF stripe_2
+    MOVLW b'01010001'
+    MOVWF stripe_3
+    MOVLW b'10001110'
+    MOVWF stripe_4
+    RETURN
+    
+SEVEN:
+    MOVLW b'10000000'
+    MOVWF stripe_1
+    MOVLW b'10010000'
+    MOVWF stripe_2
+    MOVWF stripe_3
+    MOVLW b'11111111'
+    MOVWF stripe_4
+    RETURN
+    
+EIGHT:
+    MOVLW b'01100110'
+    MOVWF stripe_4
+    MOVWF stripe_1
+    MOVLW b'10011001'
+    MOVWF stripe_2
+    MOVWF stripe_3
+    RETURN
+ 
+NINE:
+    MOVLW b'01110001'
+    MOVWF stripe_1
+    MOVLW b'10001001'
+    MOVWF stripe_2
+    MOVWF stripe_3
+    MOVLW b'01010111'
+    MOVWF stripe_4
+    RETURN
+
+    
+    
 CHECK_ALARM:
     BTFSS alarm_status, 1   ;Alarm ON or OFF?
     RETURN

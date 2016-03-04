@@ -1,4 +1,4 @@
-MPASM 5.65                         RELOJ.ASM   3-3-2016  16:59:33         PAGE  1
+MPASM 5.65                         RELOJ.ASM   3-4-2016  13:30:02         PAGE  1
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -57,7 +57,7 @@ Warning[205]: Found directive in column 1. (UDATA_SHR)
 001E                  00038 stripe_3        res 1
 001F                  00039 stripe_4        res 1
 0020                  00040 space_stripe    res 1
-MPASM 5.65                         RELOJ.ASM   3-3-2016  16:59:33         PAGE  2
+MPASM 5.65                         RELOJ.ASM   3-4-2016  13:30:02         PAGE  2
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -85,7 +85,7 @@ Warning[207]: Found label after column 1. (PUSH)
 000A   1D0B           00057         BTFSS INTCON, T0IF        ; Check T0IF.
 000B   2???           00058         GOTO RBI                  ; Exit interrupt vector. 
 000C   110B           00059         BCF INTCON, T0IF
-000D   30FB           00060         MOVLW .251                ; Pre-load TMR0
+000D   30F6           00060         MOVLW .246                ; Pre-load TMR0
 000E   0081           00061         MOVWF TMR0
                       00062         
 Warning[207]: Found label after column 1. (COLUMN_COUNTER_CONTROL)
@@ -107,7 +107,7 @@ Warning[207]: Found label after column 1. (COUNTER_RESET)
 Warning[207]: Found label after column 1. (COLUMN_INDEX_CONTROL)
 0018                  00076         COLUMN_INDEX_CONTROL:
 0018   08??           00077             MOVF column_index, 0
-0019   3C78           00078             SUBLW .120
+0019   3C3C           00078             SUBLW .60
 001A   1D03           00079             BTFSS STATUS, Z
 001B   2???           00080             GOTO INDEX_INCREMENT
 001C   2???           00081             GOTO INDEX_RESET
@@ -116,7 +116,7 @@ Warning[207]: Found label after column 1. (INDEX_INCREMENT)
 001D   0A??           00083                 INCF column_index, 1
 001E   2???           00084                 GOTO SECONDS_CONTROL
 Warning[207]: Found label after column 1. (INDEX_RESET)
-MPASM 5.65                         RELOJ.ASM   3-3-2016  16:59:33         PAGE  3
+MPASM 5.65                         RELOJ.ASM   3-4-2016  13:30:02         PAGE  3
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -131,7 +131,7 @@ Warning[207]: Found label after column 1. (SECONDS_CONTROL)
 0021   0B??           00090         DECFSZ delay_counter, 1   ; 1 second has passed.
 0022   2???           00091         GOTO POP
                       00092         
-0023   30DF           00093         MOVLW .223                  ; For 1 second delay.
+0023   3070           00093         MOVLW .112                  ; For 1 second delay.
 0024   00??           00094         MOVWF delay_counter
 0025   0B??           00095         DECFSZ delay_counter_1, 1
 0026   2???           00096         GOTO POP
@@ -175,7 +175,7 @@ Warning[207]: Found label after column 1. (CHECK_MINUTES_INC)
 003D                  00128         CHECK_MINUTES_INC:
 003D   1E06           00129             BTFSS PORTB, RB4
 003E   2???           00130             GOTO MINUTES_INCREMENT
-MPASM 5.65                         RELOJ.ASM   3-3-2016  16:59:33         PAGE  4
+MPASM 5.65                         RELOJ.ASM   3-4-2016  13:30:02         PAGE  4
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -234,7 +234,7 @@ Warning[207]: Found label after column 1. (MINUTES_INCREMENT_ALARM)
 0055   3C3C           00175                 SUBLW .60
 0056   1D03           00176                 BTFSS STATUS, Z
 0057   2???           00177                 GOTO POP
-MPASM 5.65                         RELOJ.ASM   3-3-2016  16:59:33         PAGE  5
+MPASM 5.65                         RELOJ.ASM   3-4-2016  13:30:02         PAGE  5
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -293,7 +293,7 @@ Message[302]: Register in operand not in bank 0.  Ensure that bank bits are corr
 Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
 0076   0186           00223     CLRF TRISB       
 0077   30F0           00224     MOVLW b'11110000'
-MPASM 5.65                         RELOJ.ASM   3-3-2016  16:59:33         PAGE  6
+MPASM 5.65                         RELOJ.ASM   3-4-2016  13:30:02         PAGE  6
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -352,7 +352,7 @@ Message[302]: Register in operand not in bank 0.  Ensure that bank bits are corr
 0097   2???           00268     CALL SPLIT_SECONDS          ; Call to get HH:MM:SS
 0098   2???           00269     CALL SPLIT_MINUTES
 0099   2???           00270     CALL SPLIT_HOURS
-MPASM 5.65                         RELOJ.ASM   3-3-2016  16:59:33         PAGE  7
+MPASM 5.65                         RELOJ.ASM   3-4-2016  13:30:02         PAGE  7
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -366,671 +366,874 @@ Warning[207]: Found label after column 1. (CHECK_HOURS_T)
 009B   3C04           00275    SUBLW .4
 009C   1803           00276    BTFSC STATUS, C
 009D   2???           00277    CALL display_hours_t
-009E   08??           00278    MOVF column_index, 0
-009F   3C04           00279    SUBLW .4
-00A0   1903           00280    BTFSC STATUS, Z
-00A1   2???           00281    CALL display_hours_t
-                      00282    
+                      00278    
+009E   08??           00279    MOVF column_index, 0
+009F   3C05           00280    SUBLW .5
+00A0   1D03           00281    BTFSS STATUS, Z
+00A1   2???           00282    GOTO CHECK_HOURS_U
+00A2   0185           00283    CLRF PORTA
+00A3   0186           00284    CLRF PORTB 
+00A4   2???           00285    GOTO EXIT
+                      00286    
+                      00287    ;INDEX=5
+                      00288    ;    clrf porta
+                      00289    ;    CLRF PORTB
+                      00290    ;    GOTO EXIT
+                      00291    
 Warning[207]: Found label after column 1. (CHECK_HOURS_U)
-00A2                  00283    CHECK_HOURS_U:
-00A2   08??           00284    MOVF column_index, 0
-00A3   3C06           00285    SUBLW .6
-00A4   1903           00286    BTFSC STATUS, Z
-00A5   2???           00287    CALL display_hours_u
-00A6   08??           00288    MOVF column_index, 0
-00A7   3C09           00289    SUBLW .9
-00A8   1903           00290    BTFSC STATUS, Z
-00A9   2???           00291    CALL display_hours_u
-00AA   08??           00292    MOVF column_index, 0
-00AB   3C09           00293    SUBLW .9
-00AC   1803           00294    BTFSC STATUS, C
-00AD   2???           00295    GOTO CHECK_MINUTES_T
-00AE   2???           00296    CALL display_hours_u
-                      00297    
-Warning[207]: Found label after column 1. (CHECK_MINUTES_T)
-00AF                  00298    CHECK_MINUTES_T:
-00AF   08??           00299    MOVF column_index, 0
-00B0   3C0B           00300    SUBLW .11
-00B1   1903           00301    BTFSC STATUS, Z
-00B2   2???           00302    CALL display_minutes_t
-00B3   08??           00303    MOVF column_index, 0
-00B4   3C0E           00304    SUBLW .14
-00B5   1903           00305    BTFSC STATUS, Z
-00B6   2???           00306    CALL display_minutes_t
-00B7   08??           00307    MOVF column_index, 0
-00B8   3C0E           00308    SUBLW .14
-00B9   1803           00309    BTFSC STATUS, C
-00BA   2???           00310    GOTO CHECK_MINUTES_U
-00BB   2???           00311    CALL display_minutes_t
+00A5                  00292    CHECK_HOURS_U:
+00A5   08??           00293    MOVF column_index, 0
+00A6   3C09           00294    SUBLW .9
+00A7   1803           00295    BTFSC STATUS, C
+00A8   2???           00296    GOTO SMALLER_EQUAL_9
+00A9   2???           00297    GOTO EMPTY_SPACE_2
+Warning[207]: Found label after column 1. (SMALLER_EQUAL_9)
+00AA                  00298    SMALLER_EQUAL_9:
+00AA   08??           00299    MOVF column_index, 0
+00AB   3C06           00300    SUBLW .6
+00AC   1803           00301    BTFSC STATUS, C
+00AD   2???           00302    GOTO EQUAL_6
+00AE   2???           00303    CALL display_hours_u
+00AF   2???           00304    GOTO EMPTY_SPACE_2
+Warning[207]: Found label after column 1. (EQUAL_6)
+00B0                  00305    EQUAL_6:
+00B0   08??           00306    MOVF column_index, 0
+00B1   3C06           00307    SUBLW .6
+00B2   1D03           00308    BTFSS STATUS, Z
+00B3   2???           00309    GOTO EMPTY_SPACE_2
+00B4   2???           00310    CALL display_hours_u
+                      00311    
                       00312    
+Warning[207]: Found label after column 1. (EMPTY_SPACE_2)
+00B5                  00313    EMPTY_SPACE_2:   
+00B5   08??           00314    MOVF column_index, 0
+00B6   3C0A           00315    SUBLW .10
+00B7   1D03           00316    BTFSS STATUS, Z
+00B8   2???           00317    GOTO CHECK_MINUTES_T
+00B9   0185           00318    CLRF PORTA
+MPASM 5.65                         RELOJ.ASM   3-4-2016  13:30:02         PAGE  8
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+00BA   0186           00319    CLRF PORTB 
+00BB   2???           00320    GOTO EXIT
+                      00321    
+Warning[207]: Found label after column 1. (CHECK_MINUTES_T)
+00BC                  00322    CHECK_MINUTES_T:
+00BC   08??           00323     MOVF column_index, 0
+00BD   3C0E           00324     SUBLW .14
+00BE   1803           00325     BTFSC STATUS, C
+00BF   2???           00326     GOTO SMALLER_EQUAL_14
+00C0   2???           00327     GOTO EMPTY_SPACE_3
+Warning[207]: Found label after column 1. (SMALLER_EQUAL_14)
+00C1                  00328    SMALLER_EQUAL_14:
+00C1   08??           00329     MOVF column_index, 0
+00C2   3C0B           00330     SUBLW .11
+00C3   1803           00331     BTFSC STATUS, C
+00C4   2???           00332     GOTO EQUAL_11
+00C5   2???           00333     CALL display_minutes_t
+00C6   2???           00334     GOTO EMPTY_SPACE_3
+Warning[207]: Found label after column 1. (EQUAL_11)
+00C7                  00335    EQUAL_11:
+00C7   08??           00336     MOVF column_index, 0
+00C8   3C0B           00337     SUBLW .11
+00C9   1D03           00338     BTFSS STATUS, Z
+00CA   2???           00339     GOTO EMPTY_SPACE_3
+00CB   2???           00340     CALL display_minutes_t
+                      00341    
+Warning[207]: Found label after column 1. (EMPTY_SPACE_3)
+00CC                  00342    EMPTY_SPACE_3:
+00CC   08??           00343    MOVF column_index, 0
+00CD   3C0F           00344    SUBLW .15
+00CE   1D03           00345    BTFSS STATUS, Z
+00CF   2???           00346    GOTO CHECK_MINUTES_U
+00D0   0185           00347    CLRF PORTA
+00D1   0186           00348    CLRF PORTB 
+00D2   2???           00349    GOTO EXIT
+                      00350    
 Warning[207]: Found label after column 1. (CHECK_MINUTES_U)
-00BC                  00313    CHECK_MINUTES_U:
-00BC   08??           00314    MOVF column_index, 0
-00BD   3C10           00315    SUBLW .16
-00BE   1903           00316    BTFSC STATUS, Z
-00BF   2???           00317    CALL display_minutes_u
-00C0   08??           00318    MOVF column_index, 0
-00C1   3C13           00319    SUBLW .19
-MPASM 5.65                         RELOJ.ASM   3-3-2016  16:59:33         PAGE  8
+00D3                  00351    CHECK_MINUTES_U:
+00D3   08??           00352     MOVF column_index, 0
+00D4   3C13           00353     SUBLW .19
+00D5   1803           00354     BTFSC STATUS, C
+00D6   2???           00355     GOTO SMALLER_EQUAL_19
+00D7   2???           00356     GOTO EMPTY_SPACE_4
+Warning[207]: Found label after column 1. (SMALLER_EQUAL_19)
+00D8                  00357    SMALLER_EQUAL_19:
+00D8   08??           00358     MOVF column_index, 0
+00D9   3C10           00359     SUBLW .16
+00DA   1803           00360     BTFSC STATUS, C
+00DB   2???           00361     GOTO EQUAL_16
+00DC   2???           00362     CALL display_minutes_u
+00DD   2???           00363     GOTO EMPTY_SPACE_4
+Warning[207]: Found label after column 1. (EQUAL_16)
+00DE                  00364    EQUAL_16:
+MPASM 5.65                         RELOJ.ASM   3-4-2016  13:30:02         PAGE  9
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
   VALUE
 
-00C2   1903           00320    BTFSC STATUS, Z
-00C3   2???           00321    CALL display_minutes_u
-00C4   08??           00322    MOVF column_index, 0
-00C5   3C13           00323    SUBLW .19
-00C6   1803           00324    BTFSC STATUS, C
-00C7   2???           00325    GOTO CHECK_SECONDS_T
-00C8   2???           00326    CALL display_minutes_u
-                      00327    
+00DE   08??           00365     MOVF column_index, 0
+00DF   3C10           00366     SUBLW .16
+00E0   1D03           00367     BTFSS STATUS, Z
+00E1   2???           00368     GOTO EMPTY_SPACE_4
+00E2   2???           00369     CALL display_minutes_u
+                      00370    
+Warning[207]: Found label after column 1. (EMPTY_SPACE_4)
+00E3                  00371    EMPTY_SPACE_4:
+00E3   08??           00372    MOVF column_index, 0
+00E4   3C14           00373    SUBLW .20
+00E5   1D03           00374    BTFSS STATUS, Z
+00E6   2???           00375    GOTO CHECK_SECONDS_T
+00E7   0185           00376    CLRF PORTA
+00E8   0186           00377    CLRF PORTB 
+00E9   2???           00378    GOTO EXIT
+                      00379    
 Warning[207]: Found label after column 1. (CHECK_SECONDS_T)
-00C9                  00328    CHECK_SECONDS_T:
-00C9   08??           00329    MOVF column_index, 0
-00CA   3C15           00330    SUBLW .21
-00CB   1903           00331    BTFSC STATUS, Z
-00CC   2???           00332    CALL display_seconds_t
-00CD   08??           00333    MOVF column_index, 0
-00CE   3C18           00334    SUBLW .24
-00CF   1903           00335    BTFSC STATUS, Z
-00D0   2???           00336    CALL display_seconds_t
-00D1   08??           00337    MOVF column_index, 0
-00D2   3C18           00338    SUBLW .24
-00D3   1803           00339    BTFSC STATUS, C
-00D4   2???           00340    GOTO CHECK_SECONDS_U
-00D5   2???           00341    CALL display_seconds_t
-                      00342    
+00EA                  00380    CHECK_SECONDS_T:
+00EA   08??           00381     MOVF column_index, 0
+00EB   3C18           00382     SUBLW .24
+00EC   1803           00383     BTFSC STATUS, C
+00ED   2???           00384     GOTO SMALLER_EQUAL_24
+00EE   2???           00385     GOTO EMPTY_SPACE_5
+Warning[207]: Found label after column 1. (SMALLER_EQUAL_24)
+00EF                  00386    SMALLER_EQUAL_24:
+00EF   08??           00387     MOVF column_index, 0
+00F0   3C15           00388     SUBLW .21
+00F1   1803           00389     BTFSC STATUS, C
+00F2   2???           00390     GOTO EQUAL_21
+00F3   2???           00391     CALL display_seconds_t
+00F4   2???           00392     GOTO EMPTY_SPACE_5
+Warning[207]: Found label after column 1. (EQUAL_21)
+00F5                  00393    EQUAL_21:
+00F5   08??           00394     MOVF column_index, 0
+00F6   3C15           00395     SUBLW .21
+00F7   1D03           00396     BTFSS STATUS, Z
+00F8   2???           00397     GOTO EMPTY_SPACE_5
+00F9   2???           00398     CALL display_seconds_t
+                      00399     
+Warning[207]: Found label after column 1. (EMPTY_SPACE_5)
+00FA                  00400    EMPTY_SPACE_5:
+00FA   08??           00401    MOVF column_index, 0
+00FB   3C19           00402    SUBLW .25
+00FC   1D03           00403    BTFSS STATUS, Z
+00FD   2???           00404    GOTO CHECK_SECONDS_U
+00FE   0185           00405    CLRF PORTA
+00FF   0186           00406    CLRF PORTB 
+0100   2???           00407    GOTO EXIT
+                      00408    
 Warning[207]: Found label after column 1. (CHECK_SECONDS_U)
-00D6                  00343    CHECK_SECONDS_U:
-00D6   08??           00344    MOVF column_index, 0
-00D7   3C1A           00345    SUBLW .26
-00D8   1903           00346    BTFSC STATUS, Z
-00D9   2???           00347    CALL display_seconds_u
-00DA   08??           00348    MOVF column_index, 0
-00DB   3C1D           00349    SUBLW .29
-00DC   1903           00350    BTFSC STATUS, Z
-00DD   2???           00351    CALL display_seconds_u
-00DE   08??           00352    MOVF column_index, 0
-00DF   3C1D           00353    SUBLW .29
-00E0   1803           00354    BTFSC STATUS, C
-00E1   2???           00355    GOTO EXIT
-00E2   2???           00356    CALL display_seconds_u
-Warning[207]: Found label after column 1. (EXIT)
-00E3                  00357    EXIT:
-00E3   0185           00358    CLRF PORTA
-00E4   0186           00359    CLRF PORTB
+0101                  00409    CHECK_SECONDS_U:
+0101   08??           00410     MOVF column_index, 0
+0102   3C1D           00411     SUBLW .29
+MPASM 5.65                         RELOJ.ASM   3-4-2016  13:30:02         PAGE 10
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+0103   1803           00412     BTFSC STATUS, C
+0104   2???           00413     GOTO SMALLER_EQUAL_29
+0105   2???           00414     GOTO EMPTY_SPACE_6
+Warning[207]: Found label after column 1. (SMALLER_EQUAL_29)
+0106                  00415    SMALLER_EQUAL_29:
+0106   08??           00416     MOVF column_index, 0
+0107   3C1A           00417     SUBLW .26
+0108   1803           00418     BTFSC STATUS, C
+0109   2???           00419     GOTO EQUAL_26
+010A   2???           00420     CALL display_seconds_u
+010B   2???           00421     GOTO EMPTY_SPACE_6
+Warning[207]: Found label after column 1. (EQUAL_26)
+010C                  00422    EQUAL_26:
+010C   08??           00423     MOVF column_index, 0
+010D   3C1A           00424     SUBLW .26
+010E   1D03           00425     BTFSS STATUS, Z
+010F   2???           00426     GOTO EMPTY_SPACE_6
+0110   2???           00427     CALL display_seconds_u
+                      00428    
+Warning[207]: Found label after column 1. (EMPTY_SPACE_6)
+0111                  00429    EMPTY_SPACE_6:
+0111   08??           00430    MOVF column_index, 0
+0112   3C1E           00431    SUBLW .30
+0113   1D03           00432    BTFSS STATUS, Z
+0114   2???           00433    GOTO HALF_OFF
+0115   0185           00434    CLRF PORTA
+0116   0186           00435    CLRF PORTB 
+0117   2???           00436    GOTO EXIT
+                      00437    
+Warning[207]: Found label after column 1. (HALF_OFF)
+0118                  00438    HALF_OFF:
+0118   0185           00439     CLRF PORTA
+0119   0186           00440     CLRF PORTB
+                      00441 
+011A                  00442 EXIT:
 Warning[203]: Found opcode in column 1. (GOTO)
-00E5   2???           00360 GOTO MAINPROGRAM                ; Unconditional loop.
-                      00361     
-00E6                  00362 SPLIT_SECONDS:                          ; Splits digits.
-00E6   08??           00363     MOVF seconds, 0         
-00E7   00??           00364     MOVWF seconds_u
-00E8   01??           00365     CLRF seconds_t
+011A   2???           00443 GOTO MAINPROGRAM                ; Unconditional loop.
+                      00444     
+011B                  00445 SPLIT_SECONDS:                          ; Splits digits.
+011B   08??           00446     MOVF seconds, 0         
+011C   00??           00447     MOVWF seconds_u
+011D   01??           00448     CLRF seconds_t
 Warning[207]: Found label after column 1. (SPLIT_SECONDS_LOOP)
-00E9                  00366     SPLIT_SECONDS_LOOP:                 ; Succesive substraction algorithm.
-00E9   300A           00367         MOVLW .10
-MPASM 5.65                         RELOJ.ASM   3-3-2016  16:59:33         PAGE  9
+011E                  00449     SPLIT_SECONDS_LOOP:                 ; Succesive substraction algorithm.
+011E   300A           00450         MOVLW .10
+011F   02??           00451         SUBWF seconds_u, f
+0120   1903           00452         BTFSC STATUS, Z                 ; Check for zero in result. 
+0121   2???           00453         GOTO SPLIT_SECONDS_ZERO
+0122   1C03           00454         BTFSS STATUS, C                 ; Check for underflow.
+0123   2???           00455         GOTO SPLIT_SECONDS_BORROW
+Message[305]: Using default destination of 1 (file).
+0124   0A??           00456         INCF seconds_t                  ; If none of the above -> increment.
+0125   2???           00457         GOTO SPLIT_SECONDS_LOOP         ; Loop.
+MPASM 5.65                         RELOJ.ASM   3-4-2016  13:30:02         PAGE 11
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
   VALUE
 
-00EA   02??           00368         SUBWF seconds_u, f
-00EB   1903           00369         BTFSC STATUS, Z                 ; Check for zero in result. 
-00EC   2???           00370         GOTO SPLIT_SECONDS_ZERO
-00ED   1C03           00371         BTFSS STATUS, C                 ; Check for underflow.
-00EE   2???           00372         GOTO SPLIT_SECONDS_BORROW
-Message[305]: Using default destination of 1 (file).
-00EF   0A??           00373         INCF seconds_t                  ; If none of the above -> increment.
-00F0   2???           00374         GOTO SPLIT_SECONDS_LOOP         ; Loop.
 Warning[207]: Found label after column 1. (SPLIT_SECONDS_ZERO)
-00F1                  00375     SPLIT_SECONDS_ZERO:
-00F1   0A??           00376         INCF seconds_t, f               ; Increment and exit.
-00F2   0008           00377         RETURN
+0126                  00458     SPLIT_SECONDS_ZERO:
+0126   0A??           00459         INCF seconds_t, f               ; Increment and exit.
+0127   0008           00460         RETURN
 Warning[207]: Found label after column 1. (SPLIT_SECONDS_BORROW)
-00F3                  00378     SPLIT_SECONDS_BORROW:
-00F3   300A           00379         MOVLW .10                       ; Restore original value and exit.
-00F4   07??           00380         ADDWF seconds_u, f
-00F5   0008           00381         RETURN
-                      00382 
-00F6                  00383 SPLIT_MINUTES:
-00F6   08??           00384     MOVF minutes, 0
-00F7   00??           00385     MOVWF minutes_u
-00F8   01??           00386     CLRF minutes_t
+0128                  00461     SPLIT_SECONDS_BORROW:
+0128   300A           00462         MOVLW .10                       ; Restore original value and exit.
+0129   07??           00463         ADDWF seconds_u, f
+012A   0008           00464         RETURN
+                      00465 
+012B                  00466 SPLIT_MINUTES:
+012B   08??           00467     MOVF minutes, 0
+012C   00??           00468     MOVWF minutes_u
+012D   01??           00469     CLRF minutes_t
 Warning[207]: Found label after column 1. (SPLIT_MINUTES_LOOP)
-00F9                  00387     SPLIT_MINUTES_LOOP:
-00F9   300A           00388         MOVLW .10
-00FA   02??           00389         SUBWF minutes_u, f
-00FB   1903           00390         BTFSC STATUS, Z
-00FC   2???           00391         GOTO SPLIT_MINUTES_ZERO
-00FD   1C03           00392         BTFSS STATUS, C
-00FE   2???           00393         GOTO SPLIT_MINUTES_BORROW
+012E                  00470     SPLIT_MINUTES_LOOP:
+012E   300A           00471         MOVLW .10
+012F   02??           00472         SUBWF minutes_u, f
+0130   1903           00473         BTFSC STATUS, Z
+0131   2???           00474         GOTO SPLIT_MINUTES_ZERO
+0132   1C03           00475         BTFSS STATUS, C
+0133   2???           00476         GOTO SPLIT_MINUTES_BORROW
 Message[305]: Using default destination of 1 (file).
-00FF   0A??           00394         INCF minutes_t
-0100   2???           00395         GOTO SPLIT_MINUTES_LOOP
+0134   0A??           00477         INCF minutes_t
+0135   2???           00478         GOTO SPLIT_MINUTES_LOOP
 Warning[207]: Found label after column 1. (SPLIT_MINUTES_ZERO)
-0101                  00396     SPLIT_MINUTES_ZERO:
-0101   0A??           00397         INCF minutes_t, f 
-0102   0008           00398         RETURN
+0136                  00479     SPLIT_MINUTES_ZERO:
+0136   0A??           00480         INCF minutes_t, f 
+0137   0008           00481         RETURN
 Warning[207]: Found label after column 1. (SPLIT_MINUTES_BORROW)
-0103                  00399     SPLIT_MINUTES_BORROW:
-0103   300A           00400         MOVLW .10
-0104   07??           00401         ADDWF minutes_u, f
-0105   0008           00402         RETURN
-                      00403         
-0106                  00404 SPLIT_HOURS:
-0106   08??           00405     MOVF hours, 0
-0107   00??           00406     MOVWF hours_u
-0108   01??           00407     CLRF hours_t
+0138                  00482     SPLIT_MINUTES_BORROW:
+0138   300A           00483         MOVLW .10
+0139   07??           00484         ADDWF minutes_u, f
+013A   0008           00485         RETURN
+                      00486         
+013B                  00487 SPLIT_HOURS:
+013B   08??           00488     MOVF hours, 0
+013C   00??           00489     MOVWF hours_u
+013D   01??           00490     CLRF hours_t
 Warning[207]: Found label after column 1. (SPLIT_HOURS_LOOP)
-0109                  00408     SPLIT_HOURS_LOOP:
-0109   300A           00409         MOVLW .10
-010A   02??           00410         SUBWF hours_u, f
-010B   1903           00411         BTFSC STATUS, Z
-010C   2???           00412         GOTO SPLIT_HOURS_ZERO
-MPASM 5.65                         RELOJ.ASM   3-3-2016  16:59:33         PAGE 10
-
-
-LOC  OBJECT CODE     LINE SOURCE TEXT
-  VALUE
-
-010D   1C03           00413         BTFSS STATUS, C
-010E   2???           00414         GOTO SPLIT_HOURS_BORROW
+013E                  00491     SPLIT_HOURS_LOOP:
+013E   300A           00492         MOVLW .10
+013F   02??           00493         SUBWF hours_u, f
+0140   1903           00494         BTFSC STATUS, Z
+0141   2???           00495         GOTO SPLIT_HOURS_ZERO
+0142   1C03           00496         BTFSS STATUS, C
+0143   2???           00497         GOTO SPLIT_HOURS_BORROW
 Message[305]: Using default destination of 1 (file).
-010F   0A??           00415         INCF hours_t
-0110   2???           00416         GOTO SPLIT_HOURS_LOOP
+0144   0A??           00498         INCF hours_t
+0145   2???           00499         GOTO SPLIT_HOURS_LOOP
 Warning[207]: Found label after column 1. (SPLIT_HOURS_ZERO)
-0111                  00417     SPLIT_HOURS_ZERO:
-0111   0A??           00418         INCF hours_t, f 
-0112   0008           00419         RETURN
+0146                  00500     SPLIT_HOURS_ZERO:
+0146   0A??           00501         INCF hours_t, f 
+MPASM 5.65                         RELOJ.ASM   3-4-2016  13:30:02         PAGE 12
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+0147   0008           00502         RETURN
 Warning[207]: Found label after column 1. (SPLIT_HOURS_BORROW)
-0113                  00420     SPLIT_HOURS_BORROW:
-0113   300A           00421         MOVLW .10
-0114   07??           00422         ADDWF hours_u, f
-0115   0008           00423         RETURN
-                      00424 
-0116                  00425 display_hours_t:
-0116   2???           00426     CALL ZERO
-0117   08??           00427     MOVF column_counter, 0
-0118   3C01           00428     SUBLW .1
-0119   1D03           00429     BTFSS STATUS, Z
-011A   2???           00430     GOTO hours_t_2
+0148                  00503     SPLIT_HOURS_BORROW:
+0148   300A           00504         MOVLW .10
+0149   07??           00505         ADDWF hours_u, f
+014A   0008           00506         RETURN
+                      00507 
+014B                  00508 display_hours_t:
+014B   2???           00509     CALL ZERO
+014C   08??           00510     MOVF column_counter, 0
+014D   3C01           00511     SUBLW .1
+014E   1D03           00512     BTFSS STATUS, Z
+014F   2???           00513     GOTO hours_t_2
 Warning[207]: Found label after column 1. (hours_t_1)
-011B                  00431     hours_t_1:
-011B   08??           00432         MOVF stripe_1, 0
-011C   390F           00433         ANDLW b'00001111'
-011D   0085           00434         MOVWF PORTA
-011E   08??           00435         MOVF stripe_1, 0
-011F   39F0           00436         ANDLW b'11110000'
-0120   00??           00437         MOVWF msb
-0121   0E??           00438         SWAPF msb, 0
-0122   0086           00439         MOVWF PORTB     
-0123   0008           00440         RETURN
+0150                  00514     hours_t_1:
+0150   08??           00515         MOVF stripe_1, 0
+0151   390F           00516         ANDLW b'00001111'
+0152   0085           00517         MOVWF PORTA
+0153   08??           00518         MOVF stripe_1, 0
+0154   39F0           00519         ANDLW b'11110000'
+0155   00??           00520         MOVWF msb
+0156   0E??           00521         SWAPF msb, 0
+0157   0086           00522         MOVWF PORTB     
+0158   0008           00523         RETURN
 Warning[207]: Found label after column 1. (hours_t_2)
-0124                  00441     hours_t_2:
-0124   08??           00442         MOVF column_counter, 0
-0125   3C02           00443         SUBLW .2
-0126   1D03           00444         BTFSS STATUS, Z
-0127   2???           00445         GOTO hours_t_3
-0128   08??           00446         MOVF stripe_2, 0
-0129   390F           00447         ANDLW b'00001111'
-012A   0085           00448         MOVWF PORTA
-012B   08??           00449         MOVF stripe_2, 0
-012C   39F0           00450         ANDLW b'11110000'
-012D   00??           00451         MOVWF msb
-012E   0E??           00452         SWAPF msb, 0
-012F   0086           00453         MOVWF PORTB     
-0130   0008           00454         RETURN
+0159                  00524     hours_t_2:
+0159   08??           00525         MOVF column_counter, 0
+015A   3C02           00526         SUBLW .2
+015B   1D03           00527         BTFSS STATUS, Z
+015C   2???           00528         GOTO hours_t_3
+015D   08??           00529         MOVF stripe_2, 0
+015E   390F           00530         ANDLW b'00001111'
+015F   0085           00531         MOVWF PORTA
+0160   08??           00532         MOVF stripe_2, 0
+0161   39F0           00533         ANDLW b'11110000'
+0162   00??           00534         MOVWF msb
+0163   0E??           00535         SWAPF msb, 0
+0164   0086           00536         MOVWF PORTB     
+0165   0008           00537         RETURN
 Warning[207]: Found label after column 1. (hours_t_3)
-0131                  00455     hours_t_3:
-0131   08??           00456         MOVF column_counter, 0
-0132   3C03           00457         SUBLW .3
-0133   1D03           00458         BTFSS STATUS, Z
-0134   2???           00459         GOTO hours_t_4
-MPASM 5.65                         RELOJ.ASM   3-3-2016  16:59:33         PAGE 11
+0166                  00538     hours_t_3:
+0166   08??           00539         MOVF column_counter, 0
+0167   3C03           00540         SUBLW .3
+0168   1D03           00541         BTFSS STATUS, Z
+0169   2???           00542         GOTO hours_t_4
+016A   08??           00543         MOVF stripe_3, 0
+016B   390F           00544         ANDLW b'00001111'
+016C   0085           00545         MOVWF PORTA
+016D   08??           00546         MOVF stripe_3, 0
+016E   39F0           00547         ANDLW b'11110000'
+016F   00??           00548         MOVWF msb
+0170   0E??           00549         SWAPF msb, 0
+0171   0086           00550         MOVWF PORTB
+MPASM 5.65                         RELOJ.ASM   3-4-2016  13:30:02         PAGE 13
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
   VALUE
 
-0135   08??           00460         MOVF stripe_3, 0
-0136   390F           00461         ANDLW b'00001111'
-0137   0085           00462         MOVWF PORTA
-0138   08??           00463         MOVF stripe_3, 0
-0139   39F0           00464         ANDLW b'11110000'
-013A   00??           00465         MOVWF msb
-013B   0E??           00466         SWAPF msb, 0
-013C   0086           00467         MOVWF PORTB
-013D   0008           00468         RETURN
+0172   0008           00551         RETURN
 Warning[207]: Found label after column 1. (hours_t_4)
-013E                  00469     hours_t_4:
-013E   08??           00470         MOVF column_counter, 0
-013F   3C04           00471         SUBLW .4
-0140   1D03           00472         BTFSS STATUS, Z
-0141   0008           00473         RETURN
-0142   08??           00474         MOVF stripe_4, 0
-0143   390F           00475         ANDLW b'00001111'
-0144   0085           00476         MOVWF PORTA
-0145   08??           00477         MOVF stripe_4, 0
-0146   39F0           00478         ANDLW b'11110000'
-0147   00??           00479         MOVWF msb
-0148   0E??           00480         SWAPF msb, 0
-0149   0086           00481         MOVWF PORTB
+0173                  00552     hours_t_4:
+0173   08??           00553         MOVF column_counter, 0
+0174   3C04           00554         SUBLW .4
+0175   1D03           00555         BTFSS STATUS, Z
+0176   0008           00556         RETURN
+0177   08??           00557         MOVF stripe_4, 0
+0178   390F           00558         ANDLW b'00001111'
+0179   0085           00559         MOVWF PORTA
+017A   08??           00560         MOVF stripe_4, 0
+017B   39F0           00561         ANDLW b'11110000'
+017C   00??           00562         MOVWF msb
+017D   0E??           00563         SWAPF msb, 0
+017E   0086           00564         MOVWF PORTB
 Warning[203]: Found opcode in column 1. (RETURN)
-014A   0008           00482 RETURN
-                      00483 
-014B                  00484 display_hours_u:
-014B   2???           00485     CALL ONE
-014C   08??           00486     MOVF column_counter, 0
-014D   3C01           00487     SUBLW .1
-014E   1D03           00488     BTFSS STATUS, Z
-014F   2???           00489     GOTO hours_u_2
+017F   0008           00565 RETURN
+                      00566 
+0180                  00567 display_hours_u:
+0180   2???           00568     CALL ONE
+0181   08??           00569     MOVF column_counter, 0
+0182   3C01           00570     SUBLW .1
+0183   1D03           00571     BTFSS STATUS, Z
+0184   2???           00572     GOTO hours_u_2
 Warning[207]: Found label after column 1. (hours_u_1)
-0150                  00490     hours_u_1:
-0150   08??           00491         MOVF stripe_1, 0
-0151   390F           00492         ANDLW b'00001111'
-0152   0085           00493         MOVWF PORTA
-0153   08??           00494         MOVF stripe_1, 0
-0154   39F0           00495         ANDLW b'11110000'
-0155   00??           00496         MOVWF msb
-0156   0E??           00497         SWAPF msb, 0
-0157   0086           00498         MOVWF PORTB     
-0158   0008           00499         RETURN
+0185                  00573     hours_u_1:
+0185   08??           00574         MOVF stripe_1, 0
+0186   390F           00575         ANDLW b'00001111'
+0187   0085           00576         MOVWF PORTA
+0188   08??           00577         MOVF stripe_1, 0
+0189   39F0           00578         ANDLW b'11110000'
+018A   00??           00579         MOVWF msb
+018B   0E??           00580         SWAPF msb, 0
+018C   0086           00581         MOVWF PORTB     
+018D   0008           00582         RETURN
 Warning[207]: Found label after column 1. (hours_u_2)
-0159                  00500     hours_u_2:
-0159   08??           00501         MOVF column_counter, 0
-015A   3C02           00502         SUBLW .2
-015B   1D03           00503         BTFSS STATUS, Z
-015C   2???           00504         GOTO hours_u_3
-015D   08??           00505         MOVF stripe_2, 0
-015E   390F           00506         ANDLW b'00001111'
-015F   0085           00507         MOVWF PORTA
-0160   08??           00508         MOVF stripe_2, 0
-MPASM 5.65                         RELOJ.ASM   3-3-2016  16:59:33         PAGE 12
-
-
-LOC  OBJECT CODE     LINE SOURCE TEXT
-  VALUE
-
-0161   39F0           00509         ANDLW b'11110000'
-0162   00??           00510         MOVWF msb
-0163   0E??           00511         SWAPF msb, 0
-0164   0086           00512         MOVWF PORTB     
-0165   0008           00513         RETURN
+018E                  00583     hours_u_2:
+018E   08??           00584         MOVF column_counter, 0
+018F   3C02           00585         SUBLW .2
+0190   1D03           00586         BTFSS STATUS, Z
+0191   2???           00587         GOTO hours_u_3
+0192   08??           00588         MOVF stripe_2, 0
+0193   390F           00589         ANDLW b'00001111'
+0194   0085           00590         MOVWF PORTA
+0195   08??           00591         MOVF stripe_2, 0
+0196   39F0           00592         ANDLW b'11110000'
+0197   00??           00593         MOVWF msb
+0198   0E??           00594         SWAPF msb, 0
+0199   0086           00595         MOVWF PORTB     
+019A   0008           00596         RETURN
 Warning[207]: Found label after column 1. (hours_u_3)
-0166                  00514     hours_u_3:
-0166   08??           00515         MOVF column_counter, 0
-0167   3C03           00516         SUBLW .3
-0168   1D03           00517         BTFSS STATUS, Z
-0169   2???           00518         GOTO hours_u_4
-016A   08??           00519         MOVF stripe_3, 0
-016B   390F           00520         ANDLW b'00001111'
-016C   0085           00521         MOVWF PORTA
-016D   08??           00522         MOVF stripe_3, 0
-016E   39F0           00523         ANDLW b'11110000'
-016F   00??           00524         MOVWF msb
-0170   0E??           00525         SWAPF msb, 0
-0171   0086           00526         MOVWF PORTB
-0172   0008           00527         RETURN
+019B                  00597     hours_u_3:
+019B   08??           00598         MOVF column_counter, 0
+MPASM 5.65                         RELOJ.ASM   3-4-2016  13:30:02         PAGE 14
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+019C   3C03           00599         SUBLW .3
+019D   1D03           00600         BTFSS STATUS, Z
+019E   2???           00601         GOTO hours_u_4
+019F   08??           00602         MOVF stripe_3, 0
+01A0   390F           00603         ANDLW b'00001111'
+01A1   0085           00604         MOVWF PORTA
+01A2   08??           00605         MOVF stripe_3, 0
+01A3   39F0           00606         ANDLW b'11110000'
+01A4   00??           00607         MOVWF msb
+01A5   0E??           00608         SWAPF msb, 0
+01A6   0086           00609         MOVWF PORTB
+01A7   0008           00610         RETURN
 Warning[207]: Found label after column 1. (hours_u_4)
-0173                  00528     hours_u_4:
-0173   08??           00529         MOVF column_counter, 0
-0174   3C04           00530         SUBLW .4
-0175   1D03           00531         BTFSS STATUS, Z
-0176   0008           00532         RETURN
-0177   08??           00533         MOVF stripe_4, 0
-0178   390F           00534         ANDLW b'00001111'
-0179   0085           00535         MOVWF PORTA
-017A   08??           00536         MOVF stripe_4, 0
-017B   39F0           00537         ANDLW b'11110000'
-017C   00??           00538         MOVWF msb
-017D   0E??           00539         SWAPF msb, 0
-017E   0086           00540         MOVWF PORTB
+01A8                  00611     hours_u_4:
+01A8   08??           00612         MOVF column_counter, 0
+01A9   3C04           00613         SUBLW .4
+01AA   1D03           00614         BTFSS STATUS, Z
+01AB   0008           00615         RETURN
+01AC   08??           00616         MOVF stripe_4, 0
+01AD   390F           00617         ANDLW b'00001111'
+01AE   0085           00618         MOVWF PORTA
+01AF   08??           00619         MOVF stripe_4, 0
+01B0   39F0           00620         ANDLW b'11110000'
+01B1   00??           00621         MOVWF msb
+01B2   0E??           00622         SWAPF msb, 0
+01B3   0086           00623         MOVWF PORTB
 Warning[203]: Found opcode in column 1. (RETURN)
-017F   0008           00541 RETURN
-                      00542         
-0180                  00543 display_minutes_t:
-0180   2???           00544     CALL ZERO
-0181   08??           00545     MOVF column_counter, 0
-0182   3C01           00546     SUBLW .1
-0183   1D03           00547     BTFSS STATUS, Z
-0184   2???           00548     GOTO minutes_t_2
+01B4   0008           00624 RETURN
+                      00625         
+01B5                  00626 display_minutes_t:
+01B5   2???           00627     CALL ZERO
+01B6   08??           00628     MOVF column_counter, 0
+01B7   3C01           00629     SUBLW .1
+01B8   1D03           00630     BTFSS STATUS, Z
+01B9   2???           00631     GOTO minutes_t_2
 Warning[207]: Found label after column 1. (minutes_t_1)
-0185                  00549     minutes_t_1:
-0185   08??           00550         MOVF stripe_1, 0
-0186   390F           00551         ANDLW b'00001111'
-0187   0085           00552         MOVWF PORTA
-0188   08??           00553         MOVF stripe_1, 0
-0189   39F0           00554         ANDLW b'11110000'
-018A   00??           00555         MOVWF msb
-018B   0E??           00556         SWAPF msb, 0
-018C   0086           00557         MOVWF PORTB     
-MPASM 5.65                         RELOJ.ASM   3-3-2016  16:59:33         PAGE 13
-
-
-LOC  OBJECT CODE     LINE SOURCE TEXT
-  VALUE
-
-018D   0008           00558         RETURN
+01BA                  00632     minutes_t_1:
+01BA   08??           00633         MOVF stripe_1, 0
+01BB   390F           00634         ANDLW b'00001111'
+01BC   0085           00635         MOVWF PORTA
+01BD   08??           00636         MOVF stripe_1, 0
+01BE   39F0           00637         ANDLW b'11110000'
+01BF   00??           00638         MOVWF msb
+01C0   0E??           00639         SWAPF msb, 0
+01C1   0086           00640         MOVWF PORTB     
+01C2   0008           00641         RETURN
 Warning[207]: Found label after column 1. (minutes_t_2)
-018E                  00559     minutes_t_2:
-018E   08??           00560         MOVF column_counter, 0
-018F   3C02           00561         SUBLW .2
-0190   1D03           00562         BTFSS STATUS, Z
-0191   2???           00563         GOTO minutes_t_3
-0192   08??           00564         MOVF stripe_2, 0
-0193   390F           00565         ANDLW b'00001111'
-0194   0085           00566         MOVWF PORTA
-0195   08??           00567         MOVF stripe_2, 0
-0196   39F0           00568         ANDLW b'11110000'
-0197   00??           00569         MOVWF msb
-0198   0E??           00570         SWAPF msb, 0
-0199   0086           00571         MOVWF PORTB     
-019A   0008           00572         RETURN
+01C3                  00642     minutes_t_2:
+01C3   08??           00643         MOVF column_counter, 0
+01C4   3C02           00644         SUBLW .2
+01C5   1D03           00645         BTFSS STATUS, Z
+01C6   2???           00646         GOTO minutes_t_3
+01C7   08??           00647         MOVF stripe_2, 0
+MPASM 5.65                         RELOJ.ASM   3-4-2016  13:30:02         PAGE 15
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+01C8   390F           00648         ANDLW b'00001111'
+01C9   0085           00649         MOVWF PORTA
+01CA   08??           00650         MOVF stripe_2, 0
+01CB   39F0           00651         ANDLW b'11110000'
+01CC   00??           00652         MOVWF msb
+01CD   0E??           00653         SWAPF msb, 0
+01CE   0086           00654         MOVWF PORTB     
+01CF   0008           00655         RETURN
 Warning[207]: Found label after column 1. (minutes_t_3)
-019B                  00573     minutes_t_3:
-019B   08??           00574         MOVF column_counter, 0
-019C   3C03           00575         SUBLW .3
-019D   1D03           00576         BTFSS STATUS, Z
-019E   2???           00577         GOTO minutes_t_4
-019F   08??           00578         MOVF stripe_3, 0
-01A0   390F           00579         ANDLW b'00001111'
-01A1   0085           00580         MOVWF PORTA
-01A2   08??           00581         MOVF stripe_3, 0
-01A3   39F0           00582         ANDLW b'11110000'
-01A4   00??           00583         MOVWF msb
-01A5   0E??           00584         SWAPF msb, 0
-01A6   0086           00585         MOVWF PORTB
-01A7   0008           00586         RETURN
+01D0                  00656     minutes_t_3:
+01D0   08??           00657         MOVF column_counter, 0
+01D1   3C03           00658         SUBLW .3
+01D2   1D03           00659         BTFSS STATUS, Z
+01D3   2???           00660         GOTO minutes_t_4
+01D4   08??           00661         MOVF stripe_3, 0
+01D5   390F           00662         ANDLW b'00001111'
+01D6   0085           00663         MOVWF PORTA
+01D7   08??           00664         MOVF stripe_3, 0
+01D8   39F0           00665         ANDLW b'11110000'
+01D9   00??           00666         MOVWF msb
+01DA   0E??           00667         SWAPF msb, 0
+01DB   0086           00668         MOVWF PORTB
+01DC   0008           00669         RETURN
 Warning[207]: Found label after column 1. (minutes_t_4)
-01A8                  00587     minutes_t_4:
-01A8   08??           00588         MOVF column_counter, 0
-01A9   3C04           00589         SUBLW .4
-01AA   1D03           00590         BTFSS STATUS, Z
-01AB   0008           00591         RETURN
-01AC   08??           00592         MOVF stripe_4, 0
-01AD   390F           00593         ANDLW b'00001111'
-01AE   0085           00594         MOVWF PORTA
-01AF   08??           00595         MOVF stripe_4, 0
-01B0   39F0           00596         ANDLW b'11110000'
-01B1   00??           00597         MOVWF msb
-01B2   0E??           00598         SWAPF msb, 0
-01B3   0086           00599         MOVWF PORTB
+01DD                  00670     minutes_t_4:
+01DD   08??           00671         MOVF column_counter, 0
+01DE   3C04           00672         SUBLW .4
+01DF   1D03           00673         BTFSS STATUS, Z
+01E0   0008           00674         RETURN
+01E1   08??           00675         MOVF stripe_4, 0
+01E2   390F           00676         ANDLW b'00001111'
+01E3   0085           00677         MOVWF PORTA
+01E4   08??           00678         MOVF stripe_4, 0
+01E5   39F0           00679         ANDLW b'11110000'
+01E6   00??           00680         MOVWF msb
+01E7   0E??           00681         SWAPF msb, 0
+01E8   0086           00682         MOVWF PORTB
 Warning[203]: Found opcode in column 1. (RETURN)
-01B4   0008           00600 RETURN
-                      00601 
-01B5                  00602 display_minutes_u:
-01B5   2???           00603     CALL ONE
-01B6   08??           00604     MOVF column_counter, 0
-01B7   3C01           00605     SUBLW .1
-01B8   1D03           00606     BTFSS STATUS, Z
-MPASM 5.65                         RELOJ.ASM   3-3-2016  16:59:33         PAGE 14
-
-
-LOC  OBJECT CODE     LINE SOURCE TEXT
-  VALUE
-
-01B9   2???           00607     GOTO minutes_u_2
+01E9   0008           00683 RETURN
+                      00684 
+01EA                  00685 display_minutes_u:
+01EA   2???           00686     CALL ONE
+01EB   08??           00687     MOVF column_counter, 0
+01EC   3C01           00688     SUBLW .1
+01ED   1D03           00689     BTFSS STATUS, Z
+01EE   2???           00690     GOTO minutes_u_2
 Warning[207]: Found label after column 1. (minutes_u_1)
-01BA                  00608     minutes_u_1:
-01BA   08??           00609         MOVF stripe_1, 0
-01BB   390F           00610         ANDLW b'00001111'
-01BC   0085           00611         MOVWF PORTA
-01BD   08??           00612         MOVF stripe_1, 0
-01BE   39F0           00613         ANDLW b'11110000'
-01BF   00??           00614         MOVWF msb
-01C0   0E??           00615         SWAPF msb, 0
-01C1   0086           00616         MOVWF PORTB     
-01C2   0008           00617         RETURN
+01EF                  00691     minutes_u_1:
+01EF   08??           00692         MOVF stripe_1, 0
+01F0   390F           00693         ANDLW b'00001111'
+01F1   0085           00694         MOVWF PORTA
+01F2   08??           00695         MOVF stripe_1, 0
+01F3   39F0           00696         ANDLW b'11110000'
+MPASM 5.65                         RELOJ.ASM   3-4-2016  13:30:02         PAGE 16
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+01F4   00??           00697         MOVWF msb
+01F5   0E??           00698         SWAPF msb, 0
+01F6   0086           00699         MOVWF PORTB     
+01F7   0008           00700         RETURN
 Warning[207]: Found label after column 1. (minutes_u_2)
-01C3                  00618     minutes_u_2:
-01C3   08??           00619         MOVF column_counter, 0
-01C4   3C02           00620         SUBLW .2
-01C5   1D03           00621         BTFSS STATUS, Z
-01C6   2???           00622         GOTO minutes_u_3
-01C7   08??           00623         MOVF stripe_2, 0
-01C8   390F           00624         ANDLW b'00001111'
-01C9   0085           00625         MOVWF PORTA
-01CA   08??           00626         MOVF stripe_2, 0
-01CB   39F0           00627         ANDLW b'11110000'
-01CC   00??           00628         MOVWF msb
-01CD   0E??           00629         SWAPF msb, 0
-01CE   0086           00630         MOVWF PORTB     
-01CF   0008           00631         RETURN
+01F8                  00701     minutes_u_2:
+01F8   08??           00702         MOVF column_counter, 0
+01F9   3C02           00703         SUBLW .2
+01FA   1D03           00704         BTFSS STATUS, Z
+01FB   2???           00705         GOTO minutes_u_3
+01FC   08??           00706         MOVF stripe_2, 0
+01FD   390F           00707         ANDLW b'00001111'
+01FE   0085           00708         MOVWF PORTA
+01FF   08??           00709         MOVF stripe_2, 0
+0200   39F0           00710         ANDLW b'11110000'
+0201   00??           00711         MOVWF msb
+0202   0E??           00712         SWAPF msb, 0
+0203   0086           00713         MOVWF PORTB     
+0204   0008           00714         RETURN
 Warning[207]: Found label after column 1. (minutes_u_3)
-01D0                  00632     minutes_u_3:
-01D0   08??           00633         MOVF column_counter, 0
-01D1   3C03           00634         SUBLW .3
-01D2   1D03           00635         BTFSS STATUS, Z
-01D3   2???           00636         GOTO minutes_u_4
-01D4   08??           00637         MOVF stripe_3, 0
-01D5   390F           00638         ANDLW b'00001111'
-01D6   0085           00639         MOVWF PORTA
-01D7   08??           00640         MOVF stripe_3, 0
-01D8   39F0           00641         ANDLW b'11110000'
-01D9   00??           00642         MOVWF msb
-01DA   0E??           00643         SWAPF msb, 0
-01DB   0086           00644         MOVWF PORTB
-01DC   0008           00645         RETURN
+0205                  00715     minutes_u_3:
+0205   08??           00716         MOVF column_counter, 0
+0206   3C03           00717         SUBLW .3
+0207   1D03           00718         BTFSS STATUS, Z
+0208   2???           00719         GOTO minutes_u_4
+0209   08??           00720         MOVF stripe_3, 0
+020A   390F           00721         ANDLW b'00001111'
+020B   0085           00722         MOVWF PORTA
+020C   08??           00723         MOVF stripe_3, 0
+020D   39F0           00724         ANDLW b'11110000'
+020E   00??           00725         MOVWF msb
+020F   0E??           00726         SWAPF msb, 0
+0210   0086           00727         MOVWF PORTB
+0211   0008           00728         RETURN
 Warning[207]: Found label after column 1. (minutes_u_4)
-01DD                  00646     minutes_u_4:
-01DD   08??           00647         MOVF column_counter, 0
-01DE   3C04           00648         SUBLW .4
-01DF   1D03           00649         BTFSS STATUS, Z
-01E0   0008           00650         RETURN
-01E1   08??           00651         MOVF stripe_4, 0
-01E2   390F           00652         ANDLW b'00001111'
-01E3   0085           00653         MOVWF PORTA
-01E4   08??           00654         MOVF stripe_4, 0
-01E5   39F0           00655         ANDLW b'11110000'
-MPASM 5.65                         RELOJ.ASM   3-3-2016  16:59:33         PAGE 15
+0212                  00729     minutes_u_4:
+0212   08??           00730         MOVF column_counter, 0
+0213   3C04           00731         SUBLW .4
+0214   1D03           00732         BTFSS STATUS, Z
+0215   0008           00733         RETURN
+0216   08??           00734         MOVF stripe_4, 0
+0217   390F           00735         ANDLW b'00001111'
+0218   0085           00736         MOVWF PORTA
+0219   08??           00737         MOVF stripe_4, 0
+021A   39F0           00738         ANDLW b'11110000'
+021B   00??           00739         MOVWF msb
+021C   0E??           00740         SWAPF msb, 0
+021D   0086           00741         MOVWF PORTB
+Warning[203]: Found opcode in column 1. (RETURN)
+021E   0008           00742 RETURN
+                      00743         
+021F                  00744 display_seconds_t:
+021F   2???           00745     CALL ZERO
+MPASM 5.65                         RELOJ.ASM   3-4-2016  13:30:02         PAGE 17
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
   VALUE
 
-01E6   00??           00656         MOVWF msb
-01E7   0E??           00657         SWAPF msb, 0
-01E8   0086           00658         MOVWF PORTB
-Warning[203]: Found opcode in column 1. (RETURN)
-01E9   0008           00659 RETURN
-                      00660         
-01EA                  00661 display_seconds_t:
-01EA   2???           00662     CALL ZERO
-01EB   08??           00663     MOVF column_counter, 0
-01EC   3C01           00664     SUBLW .1
-01ED   1D03           00665     BTFSS STATUS, Z
-01EE   2???           00666     GOTO seconds_t_2
+0220   08??           00746     MOVF column_counter, 0
+0221   3C01           00747     SUBLW .1
+0222   1D03           00748     BTFSS STATUS, Z
+0223   2???           00749     GOTO seconds_t_2
 Warning[207]: Found label after column 1. (seconds_t_1)
-01EF                  00667     seconds_t_1:
-01EF   08??           00668         MOVF stripe_1, 0
-01F0   390F           00669         ANDLW b'00001111'
-01F1   0085           00670         MOVWF PORTA
-01F2   08??           00671         MOVF stripe_1, 0
-01F3   39F0           00672         ANDLW b'11110000'
-01F4   00??           00673         MOVWF msb
-01F5   0E??           00674         SWAPF msb, 0
-01F6   0086           00675         MOVWF PORTB     
-01F7   0008           00676         RETURN
+0224                  00750     seconds_t_1:
+0224   08??           00751         MOVF stripe_1, 0
+0225   390F           00752         ANDLW b'00001111'
+0226   0085           00753         MOVWF PORTA
+0227   08??           00754         MOVF stripe_1, 0
+0228   39F0           00755         ANDLW b'11110000'
+0229   00??           00756         MOVWF msb
+022A   0E??           00757         SWAPF msb, 0
+022B   0086           00758         MOVWF PORTB     
+022C   0008           00759         RETURN
 Warning[207]: Found label after column 1. (seconds_t_2)
-01F8                  00677     seconds_t_2:
-01F8   08??           00678         MOVF column_counter, 0
-01F9   3C02           00679         SUBLW .2
-01FA   1D03           00680         BTFSS STATUS, Z
-01FB   2???           00681         GOTO seconds_t_3
-01FC   08??           00682         MOVF stripe_2, 0
-01FD   390F           00683         ANDLW b'00001111'
-01FE   0085           00684         MOVWF PORTA
-01FF   08??           00685         MOVF stripe_2, 0
-0200   39F0           00686         ANDLW b'11110000'
-0201   00??           00687         MOVWF msb
-0202   0E??           00688         SWAPF msb, 0
-0203   0086           00689         MOVWF PORTB     
-0204   0008           00690         RETURN
+022D                  00760     seconds_t_2:
+022D   08??           00761         MOVF column_counter, 0
+022E   3C02           00762         SUBLW .2
+022F   1D03           00763         BTFSS STATUS, Z
+0230   2???           00764         GOTO seconds_t_3
+0231   08??           00765         MOVF stripe_2, 0
+0232   390F           00766         ANDLW b'00001111'
+0233   0085           00767         MOVWF PORTA
+0234   08??           00768         MOVF stripe_2, 0
+0235   39F0           00769         ANDLW b'11110000'
+0236   00??           00770         MOVWF msb
+0237   0E??           00771         SWAPF msb, 0
+0238   0086           00772         MOVWF PORTB     
+0239   0008           00773         RETURN
 Warning[207]: Found label after column 1. (seconds_t_3)
-0205                  00691     seconds_t_3:
-0205   08??           00692         MOVF column_counter, 0
-0206   3C03           00693         SUBLW .3
-0207   1D03           00694         BTFSS STATUS, Z
-0208   2???           00695         GOTO seconds_t_4
-0209   08??           00696         MOVF stripe_3, 0
-020A   390F           00697         ANDLW b'00001111'
-020B   0085           00698         MOVWF PORTA
-020C   08??           00699         MOVF stripe_3, 0
-020D   39F0           00700         ANDLW b'11110000'
-020E   00??           00701         MOVWF msb
-020F   0E??           00702         SWAPF msb, 0
-0210   0086           00703         MOVWF PORTB
-0211   0008           00704         RETURN
-MPASM 5.65                         RELOJ.ASM   3-3-2016  16:59:33         PAGE 16
-
-
-LOC  OBJECT CODE     LINE SOURCE TEXT
-  VALUE
-
+023A                  00774     seconds_t_3:
+023A   08??           00775         MOVF column_counter, 0
+023B   3C03           00776         SUBLW .3
+023C   1D03           00777         BTFSS STATUS, Z
+023D   2???           00778         GOTO seconds_t_4
+023E   08??           00779         MOVF stripe_3, 0
+023F   390F           00780         ANDLW b'00001111'
+0240   0085           00781         MOVWF PORTA
+0241   08??           00782         MOVF stripe_3, 0
+0242   39F0           00783         ANDLW b'11110000'
+0243   00??           00784         MOVWF msb
+0244   0E??           00785         SWAPF msb, 0
+0245   0086           00786         MOVWF PORTB
+0246   0008           00787         RETURN
 Warning[207]: Found label after column 1. (seconds_t_4)
-0212                  00705     seconds_t_4:
-0212   08??           00706         MOVF column_counter, 0
-0213   3C04           00707         SUBLW .4
-0214   1D03           00708         BTFSS STATUS, Z
-0215   0008           00709         RETURN
-0216   08??           00710         MOVF stripe_4, 0
-0217   390F           00711         ANDLW b'00001111'
-0218   0085           00712         MOVWF PORTA
-0219   08??           00713         MOVF stripe_4, 0
-021A   39F0           00714         ANDLW b'11110000'
-021B   00??           00715         MOVWF msb
-021C   0E??           00716         SWAPF msb, 0
-021D   0086           00717         MOVWF PORTB
+0247                  00788     seconds_t_4:
+0247   08??           00789         MOVF column_counter, 0
+0248   3C04           00790         SUBLW .4
+0249   1D03           00791         BTFSS STATUS, Z
+024A   0008           00792         RETURN
+024B   08??           00793         MOVF stripe_4, 0
+024C   390F           00794         ANDLW b'00001111'
+MPASM 5.65                         RELOJ.ASM   3-4-2016  13:30:02         PAGE 18
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+024D   0085           00795         MOVWF PORTA
+024E   08??           00796         MOVF stripe_4, 0
+024F   39F0           00797         ANDLW b'11110000'
+0250   00??           00798         MOVWF msb
+0251   0E??           00799         SWAPF msb, 0
+0252   0086           00800         MOVWF PORTB
 Warning[203]: Found opcode in column 1. (RETURN)
-021E   0008           00718 RETURN
-                      00719 
-021F                  00720 display_seconds_u:
-021F   2???           00721     CALL ONE
-0220   08??           00722     MOVF column_counter, 0
-0221   3C01           00723     SUBLW .1
-0222   1D03           00724     BTFSS STATUS, Z
-0223   2???           00725     GOTO seconds_u_2
+0253   0008           00801 RETURN
+                      00802 
+0254                  00803 display_seconds_u:
+0254   2???           00804     CALL ONE
+0255   08??           00805     MOVF column_counter, 0
+0256   3C01           00806     SUBLW .1
+0257   1D03           00807     BTFSS STATUS, Z
+0258   2???           00808     GOTO seconds_u_2
 Warning[207]: Found label after column 1. (seconds_u_1)
-0224                  00726     seconds_u_1:
-0224   08??           00727         MOVF stripe_1, 0
-0225   390F           00728         ANDLW b'00001111'
-0226   0085           00729         MOVWF PORTA
-0227   08??           00730         MOVF stripe_1, 0
-0228   39F0           00731         ANDLW b'11110000'
-0229   00??           00732         MOVWF msb
-022A   0E??           00733         SWAPF msb, 0
-022B   0086           00734         MOVWF PORTB     
-022C   0008           00735         RETURN
+0259                  00809     seconds_u_1:
+0259   08??           00810         MOVF stripe_1, 0
+025A   390F           00811         ANDLW b'00001111'
+025B   0085           00812         MOVWF PORTA
+025C   08??           00813         MOVF stripe_1, 0
+025D   39F0           00814         ANDLW b'11110000'
+025E   00??           00815         MOVWF msb
+025F   0E??           00816         SWAPF msb, 0
+0260   0086           00817         MOVWF PORTB     
+0261   0008           00818         RETURN
 Warning[207]: Found label after column 1. (seconds_u_2)
-022D                  00736     seconds_u_2:
-022D   08??           00737         MOVF column_counter, 0
-022E   3C02           00738         SUBLW .2
-022F   1D03           00739         BTFSS STATUS, Z
-0230   2???           00740         GOTO seconds_u_3
-0231   08??           00741         MOVF stripe_2, 0
-0232   390F           00742         ANDLW b'00001111'
-0233   0085           00743         MOVWF PORTA
-0234   08??           00744         MOVF stripe_2, 0
-0235   39F0           00745         ANDLW b'11110000'
-0236   00??           00746         MOVWF msb
-0237   0E??           00747         SWAPF msb, 0
-0238   0086           00748         MOVWF PORTB     
-0239   0008           00749         RETURN
+0262                  00819     seconds_u_2:
+0262   08??           00820         MOVF column_counter, 0
+0263   3C02           00821         SUBLW .2
+0264   1D03           00822         BTFSS STATUS, Z
+0265   2???           00823         GOTO seconds_u_3
+0266   08??           00824         MOVF stripe_2, 0
+0267   390F           00825         ANDLW b'00001111'
+0268   0085           00826         MOVWF PORTA
+0269   08??           00827         MOVF stripe_2, 0
+026A   39F0           00828         ANDLW b'11110000'
+026B   00??           00829         MOVWF msb
+026C   0E??           00830         SWAPF msb, 0
+026D   0086           00831         MOVWF PORTB     
+026E   0008           00832         RETURN
 Warning[207]: Found label after column 1. (seconds_u_3)
-023A                  00750     seconds_u_3:
-023A   08??           00751         MOVF column_counter, 0
-023B   3C03           00752         SUBLW .3
-MPASM 5.65                         RELOJ.ASM   3-3-2016  16:59:33         PAGE 17
+026F                  00833     seconds_u_3:
+026F   08??           00834         MOVF column_counter, 0
+0270   3C03           00835         SUBLW .3
+0271   1D03           00836         BTFSS STATUS, Z
+0272   2???           00837         GOTO seconds_u_4
+0273   08??           00838         MOVF stripe_3, 0
+0274   390F           00839         ANDLW b'00001111'
+0275   0085           00840         MOVWF PORTA
+0276   08??           00841         MOVF stripe_3, 0
+0277   39F0           00842         ANDLW b'11110000'
+0278   00??           00843         MOVWF msb
+MPASM 5.65                         RELOJ.ASM   3-4-2016  13:30:02         PAGE 19
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
   VALUE
 
-023C   1D03           00753         BTFSS STATUS, Z
-023D   2???           00754         GOTO seconds_u_4
-023E   08??           00755         MOVF stripe_3, 0
-023F   390F           00756         ANDLW b'00001111'
-0240   0085           00757         MOVWF PORTA
-0241   08??           00758         MOVF stripe_3, 0
-0242   39F0           00759         ANDLW b'11110000'
-0243   00??           00760         MOVWF msb
-0244   0E??           00761         SWAPF msb, 0
-0245   0086           00762         MOVWF PORTB
-0246   0008           00763         RETURN
+0279   0E??           00844         SWAPF msb, 0
+027A   0086           00845         MOVWF PORTB
+027B   0008           00846         RETURN
 Warning[207]: Found label after column 1. (seconds_u_4)
-0247                  00764     seconds_u_4:
-0247   08??           00765         MOVF column_counter, 0
-0248   3C04           00766         SUBLW .4
-0249   1D03           00767         BTFSS STATUS, Z
-024A   0008           00768         RETURN
-024B   08??           00769         MOVF stripe_4, 0
-024C   390F           00770         ANDLW b'00001111'
-024D   0085           00771         MOVWF PORTA
-024E   08??           00772         MOVF stripe_4, 0
-024F   39F0           00773         ANDLW b'11110000'
-0250   00??           00774         MOVWF msb
-0251   0E??           00775         SWAPF msb, 0
-0252   0086           00776         MOVWF PORTB
+027C                  00847     seconds_u_4:
+027C   08??           00848         MOVF column_counter, 0
+027D   3C04           00849         SUBLW .4
+027E   1D03           00850         BTFSS STATUS, Z
+027F   0008           00851         RETURN
+0280   08??           00852         MOVF stripe_4, 0
+0281   390F           00853         ANDLW b'00001111'
+0282   0085           00854         MOVWF PORTA
+0283   08??           00855         MOVF stripe_4, 0
+0284   39F0           00856         ANDLW b'11110000'
+0285   00??           00857         MOVWF msb
+0286   0E??           00858         SWAPF msb, 0
+0287   0086           00859         MOVWF PORTB
 Warning[203]: Found opcode in column 1. (RETURN)
-0253   0008           00777 RETURN
-                      00778         
-0254                  00779 ZERO:
-0254   30FF           00780     MOVLW .255
-0255   00??           00781     MOVWF stripe_1
-0256   00??           00782     MOVWF stripe_4
-0257   3081           00783     MOVLW b'10000001'
-0258   00??           00784     MOVWF stripe_2
-0259   00??           00785     MOVWF stripe_3
-025A   0008           00786     RETURN
-                      00787     
-025B                  00788 ONE:
-025B   01??           00789     CLRF stripe_1
-025C   01??           00790     CLRF stripe_2
-025D   01??           00791     CLRF stripe_3
-025E   30FF           00792     MOVLW .255
-025F   00??           00793     MOVWF stripe_4
-0260   0008           00794     RETURN
-0261                  00795 CHECK_ALARM:
-0261   1C80           00796     BTFSS alarm_status, 1   ;Alarm ON or OFF?
-0262   0008           00797     RETURN
-0263   08??           00798     MOVF minutes, 0
-0264   02??           00799     SUBWF alarm_minutes, 0
-0265   1D03           00800     BTFSS STATUS, Z
-0266   0008           00801     RETURN
-0267   08??           00802     MOVF hours, 0
-0268   02??           00803     SUBWF alarm_hours, 0
-MPASM 5.65                         RELOJ.ASM   3-3-2016  16:59:33         PAGE 18
+0288   0008           00860 RETURN
+                      00861         
+0289                  00862 ZERO:
+0289   30FF           00863     MOVLW .255
+028A   00??           00864     MOVWF stripe_1
+028B   00??           00865     MOVWF stripe_4
+028C   3081           00866     MOVLW b'10000001'
+028D   00??           00867     MOVWF stripe_2
+028E   00??           00868     MOVWF stripe_3
+028F   0008           00869     RETURN
+                      00870     
+0290                  00871 ONE:
+0290   01??           00872     CLRF stripe_1
+0291   01??           00873     CLRF stripe_2
+0292   01??           00874     CLRF stripe_3
+0293   30FF           00875     MOVLW .255
+0294   00??           00876     MOVWF stripe_4
+0295   0008           00877     RETURN
+                      00878     
+0296                  00879 TWO:
+0296   3043           00880     MOVLW b'01000011'
+0297   00??           00881     MOVWF stripe_1
+0298   3085           00882     MOVLW b'10000101'
+0299   00??           00883     MOVWF stripe_2
+029A   3089           00884     MOVLW b'10001001'
+029B   00??           00885     MOVWF stripe_3
+029C   3071           00886     MOVLW b'01110001'
+029D   00??           00887     MOVWF stripe_4
+029E   0008           00888     RETURN
+                      00889     
+029F                  00890 THREE:
+029F   3042           00891     MOVLW b'01000010'
+02A0   00??           00892     MOVWF stripe_1
+02A1   3081           00893     MOVLW b'10000001'
+02A2   00??           00894     MOVWF stripe_2
+MPASM 5.65                         RELOJ.ASM   3-4-2016  13:30:02         PAGE 20
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
   VALUE
 
-0269   1D03           00804     BTFSS STATUS, Z
-026A   0008           00805     RETURN
-                      00806     ;Do something!!
-026B   0008           00807     RETURN
+02A3   3091           00895     MOVLW b'10010001'
+02A4   00??           00896     MOVWF stripe_3
+02A5   306E           00897     MOVLW b'01101110'
+02A6   00??           00898     MOVWF stripe_4
+02A7   0008           00899     RETURN
+                      00900 
+02A8                  00901 FOUR:
+02A8   30F8           00902     MOVLW b'11111000'
+02A9   00??           00903     MOVWF stripe_1
+02AA   3008           00904     MOVLW b'00001000'
+02AB   00??           00905     MOVWF stripe_2
+02AC   303F           00906     MOVLW b'00111111'
+02AD   00??           00907     MOVWF stripe_3
+02AE   3008           00908     MOVLW b'00001000'
+02AF   00??           00909     MOVWF stripe_4
+02B0   0008           00910     RETURN
+                      00911     
+02B1                  00912 FIVE:
+02B1   30FA           00913     MOVLW b'11111010'
+02B2   00??           00914     MOVWF stripe_1
+02B3   3091           00915     MOVLW b'10010001'
+02B4   00??           00916     MOVWF stripe_2
+02B5   3091           00917     MOVLW b'10010001'
+02B6   00??           00918     MOVWF stripe_3
+02B7   308E           00919     MOVLW b'10001110'
+02B8   00??           00920     MOVWF stripe_4
+02B9   0008           00921     RETURN
+                      00922 
+02BA                  00923 SIX:
+02BA   301E           00924     MOVLW b'00011110'
+02BB   00??           00925     MOVWF stripe_1
+02BC   3031           00926     MOVLW b'00110001'
+02BD   00??           00927     MOVWF stripe_2
+02BE   3051           00928     MOVLW b'01010001'
+02BF   00??           00929     MOVWF stripe_3
+02C0   308E           00930     MOVLW b'10001110'
+02C1   00??           00931     MOVWF stripe_4
+02C2   0008           00932     RETURN
+                      00933     
+02C3                  00934 SEVEN:
+02C3   3080           00935     MOVLW b'10000000'
+02C4   00??           00936     MOVWF stripe_1
+02C5   3090           00937     MOVLW b'10010000'
+02C6   00??           00938     MOVWF stripe_2
+02C7   00??           00939     MOVWF stripe_3
+02C8   30FF           00940     MOVLW b'11111111'
+02C9   00??           00941     MOVWF stripe_4
+02CA   0008           00942     RETURN
+                      00943     
+02CB                  00944 EIGHT:
+02CB   3066           00945     MOVLW b'01100110'
+02CC   00??           00946     MOVWF stripe_4
+02CD   00??           00947     MOVWF stripe_1
+MPASM 5.65                         RELOJ.ASM   3-4-2016  13:30:02         PAGE 21
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+02CE   3099           00948     MOVLW b'10011001'
+02CF   00??           00949     MOVWF stripe_2
+02D0   00??           00950     MOVWF stripe_3
+02D1   0008           00951     RETURN
+                      00952  
+02D2                  00953 NINE:
+02D2   3071           00954     MOVLW b'01110001'
+02D3   00??           00955     MOVWF stripe_1
+02D4   3089           00956     MOVLW b'10001001'
+02D5   00??           00957     MOVWF stripe_2
+02D6   00??           00958     MOVWF stripe_3
+02D7   3057           00959     MOVLW b'01010111'
+02D8   00??           00960     MOVWF stripe_4
+02D9   0008           00961     RETURN
+                      00962 
+                      00963     
+                      00964     
+02DA                  00965 CHECK_ALARM:
+02DA   1C80           00966     BTFSS alarm_status, 1   ;Alarm ON or OFF?
+02DB   0008           00967     RETURN
+02DC   08??           00968     MOVF minutes, 0
+02DD   02??           00969     SUBWF alarm_minutes, 0
+02DE   1D03           00970     BTFSS STATUS, Z
+02DF   0008           00971     RETURN
+02E0   08??           00972     MOVF hours, 0
+02E1   02??           00973     SUBWF alarm_hours, 0
+02E2   1D03           00974     BTFSS STATUS, Z
+02E3   0008           00975     RETURN
+                      00976     ;Do something!!
+02E4   0008           00977     RETURN
 Warning[205]: Found directive in column 1. (END)
-3FF1                  00808 END
-MPASM 5.65                         RELOJ.ASM   3-3-2016  16:59:33         PAGE 19
+3FF1                  00978 END
+MPASM 5.65                         RELOJ.ASM   3-4-2016  13:30:02         PAGE 22
 
 
 SYMBOL TABLE
   LABEL                             VALUE 
 
 C                                 00000000
-CHECK_ALARM                       00000261
+CHECK_ALARM                       000002DA
 CHECK_ALARM_STATE                 00000035
 CHECK_HOURS_INC                   0000003F
 CHECK_HOURS_T                     0000009A
-CHECK_HOURS_U                     000000A2
+CHECK_HOURS_U                     000000A5
 CHECK_MINUTES_INC                 0000003D
-CHECK_MINUTES_T                   000000AF
-CHECK_MINUTES_U                   000000BC
+CHECK_MINUTES_T                   000000BC
+CHECK_MINUTES_U                   000000D3
 CHECK_MODE                        0000002D
-CHECK_SECONDS_T                   000000C9
-CHECK_SECONDS_U                   000000D6
+CHECK_SECONDS_T                   000000EA
+CHECK_SECONDS_U                   00000101
 COLUMN_COUNTER_CONTROL            0000000F
 COLUMN_INDEX_CONTROL              00000018
 COUNTER_INCREMENT                 00000014
@@ -1042,10 +1245,24 @@ EECON2                            00000089
 EEDATA                            00000008
 EEIE                              00000006
 EEIF                              00000004
-EXIT                              000000E3
+EIGHT                             000002CB
+EMPTY_SPACE_2                     000000B5
+EMPTY_SPACE_3                     000000CC
+EMPTY_SPACE_4                     000000E3
+EMPTY_SPACE_5                     000000FA
+EMPTY_SPACE_6                     00000111
+EQUAL_11                          000000C7
+EQUAL_16                          000000DE
+EQUAL_21                          000000F5
+EQUAL_26                          0000010C
+EQUAL_6                           000000B0
+EXIT                              0000011A
 F                                 00000001
+FIVE                              000002B1
+FOUR                              000002A8
 FSR                               00000004
 GIE                               00000007
+HALF_OFF                          00000118
 HOURS_DISPLAY                     0000005B
 HOURS_INCREMENT                   0000005B
 HOURS_INCREMENT_ALARM             00000065
@@ -1058,13 +1275,20 @@ INTEDG                            00000006
 INTF                              00000001
 IRP                               00000007
 MAINPROGRAM                       00000097
+MPASM 5.65                         RELOJ.ASM   3-4-2016  13:30:02         PAGE 23
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
 MINUTES_DISPLAY                   00000049
 MINUTES_INCREMENT                 00000049
 MINUTES_INCREMENT_ALARM           00000053
+NINE                              000002D2
 NOT_PD                            00000003
 NOT_RBPU                          00000007
 NOT_TO                            00000004
-ONE                               0000025B
+ONE                               00000290
 OPTION_REG                        00000081
 PCL                               00000002
 PCLATH                            0000000A
@@ -1072,12 +1296,6 @@ POP                               0000006C
 PORTA                             00000005
 PORTB                             00000006
 PS0                               00000000
-MPASM 5.65                         RELOJ.ASM   3-3-2016  16:59:33         PAGE 20
-
-
-SYMBOL TABLE
-  LABEL                             VALUE 
-
 PS1                               00000001
 PS2                               00000002
 PSA                               00000003
@@ -1105,23 +1323,37 @@ SECONDS_CONTROL                   00000021
 SECONDS_DISPLAY                   00000042
 SECONDS_INCREMENT                 00000042
 SETUP                             00000074
-SPLIT_HOURS                       00000106
-SPLIT_HOURS_BORROW                00000113
-SPLIT_HOURS_LOOP                  00000109
-SPLIT_HOURS_ZERO                  00000111
-SPLIT_MINUTES                     000000F6
-SPLIT_MINUTES_BORROW              00000103
-SPLIT_MINUTES_LOOP                000000F9
-SPLIT_MINUTES_ZERO                00000101
-SPLIT_SECONDS                     000000E6
-SPLIT_SECONDS_BORROW              000000F3
-SPLIT_SECONDS_LOOP                000000E9
-SPLIT_SECONDS_ZERO                000000F1
+SEVEN                             000002C3
+SIX                               000002BA
+SMALLER_EQUAL_14                  000000C1
+SMALLER_EQUAL_19                  000000D8
+SMALLER_EQUAL_24                  000000EF
+SMALLER_EQUAL_29                  00000106
+SMALLER_EQUAL_9                   000000AA
+SPLIT_HOURS                       0000013B
+SPLIT_HOURS_BORROW                00000148
+SPLIT_HOURS_LOOP                  0000013E
+SPLIT_HOURS_ZERO                  00000146
+MPASM 5.65                         RELOJ.ASM   3-4-2016  13:30:02         PAGE 24
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+SPLIT_MINUTES                     0000012B
+SPLIT_MINUTES_BORROW              00000138
+SPLIT_MINUTES_LOOP                0000012E
+SPLIT_MINUTES_ZERO                00000136
+SPLIT_SECONDS                     0000011B
+SPLIT_SECONDS_BORROW              00000128
+SPLIT_SECONDS_LOOP                0000011E
+SPLIT_SECONDS_ZERO                00000126
 STATUS                            00000003
 T0CS                              00000005
 T0IE                              00000005
 T0IF                              00000002
 T0SE                              00000004
+THREE                             0000029F
 TMR0                              00000001
 TMR0IE                            00000005
 TMR0IF                            00000002
@@ -1131,12 +1363,6 @@ TRISA1                            00000001
 TRISA2                            00000002
 TRISA3                            00000003
 TRISA4                            00000004
-MPASM 5.65                         RELOJ.ASM   3-3-2016  16:59:33         PAGE 21
-
-
-SYMBOL TABLE
-  LABEL                             VALUE 
-
 TRISB                             00000086
 TRISB0                            00000000
 TRISB1                            00000001
@@ -1146,12 +1372,13 @@ TRISB4                            00000004
 TRISB5                            00000005
 TRISB6                            00000006
 TRISB7                            00000007
+TWO                               00000296
 W                                 00000000
 WR                                00000001
 WREN                              00000002
 WRERR                             00000003
 Z                                 00000002
-ZERO                              00000254
+ZERO                              00000289
 _CONFIG                           00002007
 _CP_OFF                           00003FFF
 _CP_ON                            0000000F
@@ -1166,6 +1393,12 @@ _IDLOC1                           00002001
 _IDLOC2                           00002002
 _IDLOC3                           00002003
 _LP_OSC                           00003FFC
+MPASM 5.65                         RELOJ.ASM   3-4-2016  13:30:02         PAGE 25
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
 _PWRTE_OFF                        00003FFF
 _PWRTE_ON                         00003FF7
 _RC_OSC                           00003FFF
@@ -1184,53 +1417,53 @@ column_counter                    0000001A
 column_index                      0000001B
 delay_counter                     0000000C
 delay_counter_1                   0000000D
-display_hours_t                   00000116
-display_hours_u                   0000014B
-display_minutes_t                 00000180
-display_minutes_u                 000001B5
-display_seconds_t                 000001EA
-display_seconds_u                 0000021F
-MPASM 5.65                         RELOJ.ASM   3-3-2016  16:59:33         PAGE 22
+display_hours_t                   0000014B
+display_hours_u                   00000180
+display_minutes_t                 000001B5
+display_minutes_u                 000001EA
+display_seconds_t                 0000021F
+display_seconds_u                 00000254
+hours                             00000014
+hours_t                           00000015
+hours_t_1                         00000150
+hours_t_2                         00000159
+hours_t_3                         00000166
+hours_t_4                         00000173
+hours_u                           00000016
+hours_u_1                         00000185
+hours_u_2                         0000018E
+hours_u_3                         0000019B
+hours_u_4                         000001A8
+minutes                           00000011
+minutes_t                         00000012
+minutes_t_1                       000001BA
+minutes_t_2                       000001C3
+minutes_t_3                       000001D0
+minutes_t_4                       000001DD
+minutes_u                         00000013
+minutes_u_1                       000001EF
+minutes_u_2                       000001F8
+minutes_u_3                       00000205
+minutes_u_4                       00000212
+msb                               00000021
+pclath_temp                       00000022
+seconds                           0000000E
+seconds_t                         0000000F
+seconds_t_1                       00000224
+seconds_t_2                       0000022D
+seconds_t_3                       0000023A
+MPASM 5.65                         RELOJ.ASM   3-4-2016  13:30:02         PAGE 26
 
 
 SYMBOL TABLE
   LABEL                             VALUE 
 
-hours                             00000014
-hours_t                           00000015
-hours_t_1                         0000011B
-hours_t_2                         00000124
-hours_t_3                         00000131
-hours_t_4                         0000013E
-hours_u                           00000016
-hours_u_1                         00000150
-hours_u_2                         00000159
-hours_u_3                         00000166
-hours_u_4                         00000173
-minutes                           00000011
-minutes_t                         00000012
-minutes_t_1                       00000185
-minutes_t_2                       0000018E
-minutes_t_3                       0000019B
-minutes_t_4                       000001A8
-minutes_u                         00000013
-minutes_u_1                       000001BA
-minutes_u_2                       000001C3
-minutes_u_3                       000001D0
-minutes_u_4                       000001DD
-msb                               00000021
-pclath_temp                       00000022
-seconds                           0000000E
-seconds_t                         0000000F
-seconds_t_1                       000001EF
-seconds_t_2                       000001F8
-seconds_t_3                       00000205
-seconds_t_4                       00000212
+seconds_t_4                       00000247
 seconds_u                         00000010
-seconds_u_1                       00000224
-seconds_u_2                       0000022D
-seconds_u_3                       0000023A
-seconds_u_4                       00000247
+seconds_u_1                       00000259
+seconds_u_2                       00000262
+seconds_u_3                       0000026F
+seconds_u_4                       0000027C
 space_stripe                      00000020
 status_temp                       00000021
 stripe_1                          0000001C
@@ -1241,7 +1474,7 @@ w_temp                            00000020
 w_temp1                           000000A0
 
 Errors   :     0
-Warnings :    77 reported,     0 suppressed
+Warnings :    92 reported,     0 suppressed
 Messages :    12 reported,     0 suppressed
 
 
