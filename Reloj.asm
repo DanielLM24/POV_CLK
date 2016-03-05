@@ -9,7 +9,7 @@
 list      p=16F84A            ; list directive to define processor
 #include <p16F84A.inc>        ; processor specific variable definitions
 
-__CONFIG   _CP_OFF & _WDT_OFF & _PWRTE_ON & _XT_OSC
+__CONFIG   _CP_OFF & _WDT_OFF & _PWRTE_ON & _HS_OSC
     
 ;***************VARIABLE DEFINITION*********************************************
 UDATA_SHR 0x0C
@@ -39,6 +39,7 @@ stripe_3	res 1
 stripe_4	res 1
 space_stripe	res 1
 msb		res 1
+xor_var		res 1
 ;*******************************************************************************
 ORG 0x0000
     NOP
@@ -57,7 +58,7 @@ ORG 0x0004
 	BTFSS INTCON, T0IF	  ; Check T0IF.
         GOTO RBI		  ; Exit interrupt vector. 
 	BCF INTCON, T0IF
-	MOVLW .246		  ; Pre-load TMR0
+	MOVLW .248		  ; Pre-load TMR0
 	MOVWF TMR0
 	
     COLUMN_COUNTER_CONTROL:
@@ -90,12 +91,12 @@ ORG 0x0004
 	DECFSZ delay_counter, 1	  ; 1 second has passed.
 	GOTO POP
 	
-	MOVLW .112		    ; For 1 second delay.
+	MOVLW .200		    ; For 1 second delay.
 	MOVWF delay_counter
 	DECFSZ delay_counter_1, 1
 	GOTO POP
 	
-	MOVLW .7
+	MOVLW .5
 	MOVWF delay_counter_1
 	GOTO SECONDS_INCREMENT
 	
@@ -223,8 +224,9 @@ SETUP:
     CLRF TRISB       
     MOVLW b'11110000'
     MOVWF TRISB
+    CLRF TRISB
     CLRF TRISA
-    MOVLW b'10101000'		; Enables interrupts from TMR0 an RB (IOC).
+    MOVLW b'10100000'		; Enables interrupts from TMR0 an RB (IOC).
     MOVWF INTCON
 	    
     BCF OPTION_REG, T0CS        ; TMR0 CLOCK SOURCE: INTERNAL INSTRUCTION CYCLE CLOCK
@@ -237,9 +239,9 @@ SETUP:
     CLRF PORTA			
     CLRF PORTB
     
-    MOVLW .223			; For TMR0 delay of 1000ms 
+    MOVLW .200			; For TMR0 delay of 1000ms 
     MOVWF delay_counter
-    MOVLW .7
+    MOVLW .5
     MOVWF delay_counter_1
     
     MOVLW .15			; Initial time.
@@ -251,6 +253,7 @@ SETUP:
     MOVWF column_counter
     MOVWF column_index
     
+    CLRF xor_var
     CLRF stripe_1
     CLRF stripe_2
     CLRF stripe_3
@@ -265,7 +268,7 @@ SETUP:
 				;   1	|     S	    |	Alarm ON
 				;	|     C	    |	Alarm OFF
 MAINPROGRAM:
-    CALL SPLIT_SECONDS		; Call to get HH:MM:SS
+ CALL SPLIT_SECONDS		; Call to get HH:MM:SS
     CALL SPLIT_MINUTES
     CALL SPLIT_HOURS
     ;CALL CHECK_ALARM
@@ -506,7 +509,9 @@ SPLIT_HOURS:
 	RETURN
 
 display_hours_t:
-    CALL ZERO
+    MOVF hours_t, 0
+    MOVWF xor_var
+    CALL SWITCHCASE
     MOVF column_counter, 0
     SUBLW .1
     BTFSS STATUS, Z
@@ -565,7 +570,9 @@ display_hours_t:
 RETURN
 
 display_hours_u:
-    CALL ONE
+    MOVF hours_u, 0
+    MOVWF xor_var
+    CALL SWITCHCASE
     MOVF column_counter, 0
     SUBLW .1
     BTFSS STATUS, Z
@@ -624,7 +631,9 @@ display_hours_u:
 RETURN
 	
 display_minutes_t:
-    CALL ZERO
+    MOVF minutes_t, 0
+    MOVWF xor_var
+    CALL SWITCHCASE   
     MOVF column_counter, 0
     SUBLW .1
     BTFSS STATUS, Z
@@ -683,7 +692,9 @@ display_minutes_t:
 RETURN
 
 display_minutes_u:
-    CALL ONE
+    MOVF minutes_u, 0
+    MOVWF xor_var
+    CALL SWITCHCASE
     MOVF column_counter, 0
     SUBLW .1
     BTFSS STATUS, Z
@@ -742,7 +753,9 @@ display_minutes_u:
 RETURN
 	
 display_seconds_t:
-    CALL ZERO
+    MOVF seconds_t, 0
+    MOVWF xor_var
+    CALL SWITCHCASE
     MOVF column_counter, 0
     SUBLW .1
     BTFSS STATUS, Z
@@ -801,7 +814,9 @@ display_seconds_t:
 RETURN
 
 display_seconds_u:
-    CALL ONE
+    MOVF seconds_u, 0
+    MOVWF xor_var
+    CALL SWITCHCASE
     MOVF column_counter, 0
     SUBLW .1
     BTFSS STATUS, Z
@@ -960,6 +975,81 @@ NINE:
     MOVWF stripe_4
     RETURN
 
+SWITCHCASE:		; Case implementation for display value assignment.
+    MOVF xor_var,0
+    XORLW .0		; Zero will result if W=L.
+    BTFSC STATUS, Z
+    GOTO CASE_ZERO
+    MOVF xor_var,0
+    XORLW .1		; Zero will result if W=L.
+    BTFSC STATUS, Z
+    GOTO CASE_ONE
+    MOVF xor_var,0
+    XORLW .2		; Zero will result if W=L.
+    BTFSC STATUS, Z
+    GOTO CASE_TWO
+    MOVF xor_var,0
+    XORLW .3		; Zero will result if W=L.
+    BTFSC STATUS, Z
+    GOTO CASE_THREE
+    MOVF xor_var,0
+    XORLW .4		; Zero will result if W=L.
+    BTFSC STATUS, Z
+    GOTO CASE_FOUR
+    MOVF xor_var,0
+    XORLW .5		; Zero will result if W=L.
+    BTFSC STATUS, Z
+    GOTO CASE_FIVE
+    MOVF xor_var,0
+    XORLW .6		; Zero will result if W=L.
+    BTFSC STATUS, Z
+    GOTO CASE_SIX
+    MOVF xor_var,0
+    XORLW .7		; Zero will result if W=L.
+    BTFSC STATUS, Z
+    GOTO CASE_SEVEN
+    MOVF xor_var,0
+    XORLW .8		; Zero will result if W=L.
+    BTFSC STATUS, Z
+    GOTO CASE_EIGHT
+    MOVF xor_var,0
+    XORLW .9		; Zero will result if W=L.
+    BTFSC STATUS, Z
+    GOTO CASE_NINE
+    GOTO DEFAULT  
+    
+   CASE_ZERO:
+	CALL ZERO
+	RETURN
+   CASE_ONE:
+	CALL ONE
+	RETURN
+   CASE_TWO:
+	CALL TWO
+	RETURN
+   CASE_THREE:
+	CALL THREE
+	RETURN
+   CASE_FOUR:
+	CALL FOUR
+	RETURN
+   CASE_FIVE:
+	CALL FIVE
+	RETURN
+   CASE_SIX:
+	CALL SIX
+	RETURN
+   CASE_SEVEN:
+	CALL SEVEN
+	RETURN
+   CASE_EIGHT:
+	CALL EIGHT
+	RETURN
+   CASE_NINE:
+	CALL NINE
+	RETURN
+   DEFAULT:
+    RETURN
     
     
 CHECK_ALARM:
