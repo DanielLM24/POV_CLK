@@ -28,18 +28,22 @@ minutes_u	res 1
 hours		res 1
 hours_t		res 1
 hours_u		res 1
-alarm_minutes	res 1			; Variables for alarm setting.
-alarm_hours	res 1
-alarm_status	res 1	
-column_counter	res 1
-column_index	res 1
+column_counter	res 1			; Variables for display control.
+column_index	res 1			
 stripe_1	res 1
 stripe_2	res 1
 stripe_3	res 1
 stripe_4	res 1
 space_stripe	res 1
-msb		res 1
-xor_var		res 1
+msb		res 1			; MSB for display.
+xor_var		res 1			; Storage variable for xor operation.
+minutes_delay_counter	res 1		; Variables for button debounce.
+minutes_delay_counter_1	res 1
+hours_delay_counter	res 1
+hours_delay_counter_1	res 1
+animation_delay_counter	res 1
+animation_delay_counter_1 res 1
+animation		res 1		; Variable for mode control.
 ;*******************************************************************************
 ORG 0x0000
     NOP
@@ -61,7 +65,7 @@ ORG 0x0004
 	MOVLW .248		  ; Pre-load TMR0
 	MOVWF TMR0
 	
-    COLUMN_COUNTER_CONTROL:
+    COLUMN_COUNTER_CONTROL:		; Counts columns for individual digit display. 1 to 5.
 	    MOVF column_counter, 0
 	    SUBLW .5
 	    BTFSS STATUS, Z
@@ -74,7 +78,7 @@ ORG 0x0004
 		MOVLW .1
 		MOVWF column_counter
 		
-	COLUMN_INDEX_CONTROL:
+	COLUMN_INDEX_CONTROL:	     ; Index for revolution split. 1 revolution is split into 60 stripes.
 	    MOVF column_index, 0
 	    SUBLW .60
 	    BTFSS STATUS, Z
@@ -96,7 +100,7 @@ ORG 0x0004
 	DECFSZ delay_counter_1, 1
 	GOTO POP
 	
-	MOVLW .5
+	MOVLW .5		    
 	MOVWF delay_counter_1
 	GOTO SECONDS_INCREMENT
 	
@@ -104,43 +108,35 @@ ORG 0x0004
 	BTFSS INTCON, RBIF	    ; Interrupt not caused by button press.
 	GOTO POP
 	BCF INTCON, RBIF	    ; Interrupt flag clear.
-	CHECK_MODE:
-	    BTFSC PORTB, RB6
-	    GOTO CHECK_ALARM_STATE
-	    BTFSC alarm_status, 0	    ; Check clock mode (Alarm Set/Run)		
-	    GOTO alarm_setting	
-	    BSF alarm_status, 0		    ; Enable alarm setting.
-	    GOTO POP
-	    alarm_setting:
-            BCF alarm_status, 0		    ; Enable run mode.
-	    GOTO POP
 	
-	CHECK_ALARM_STATE:
+	CHECK_ANIMATION_STATE:		    ; Changes clock operation mode (Run/Animation)
 	    BTFSC PORTB, RB7	    
 	    GOTO CHECK_MINUTES_INC
-	    BTFSC alarm_status, 1   ; Check alarm status (ON/OFF)		
-	    GOTO alarm_on	
-	    BSF alarm_status, 1	    ; Enable alarm.
-	    GOTO POP
-	    alarm_on:
-            BCF alarm_status, 1	    ; Disable alarm.
-	    GOTO POP
+	ANIMATION_DELAY:		    ; Delay for button debounce.
+	    MOVLW .255
+	    MOVWF animation_delay_counter
+	    MOVWF animation_delay_counter_1
+	    ANIMATION_DELAY_LOOP:
+	    DECFSZ animation_delay_counter
+	    GOTO ANIMATION_DELAY_LOOP
+	    DECFSZ animation_delay_counter_1
+	    GOTO ANIMATION_DELAY_LOOP
+	    
+	    BTFSC animation, 0		    ; Mode change.
+	    GOTO ANIMATING
+	    BSF animation, 0
+	    GOTO CHECK_MINUTES_INC
+	    ANIMATING:
+	    BCF animation, 0
+
 	    
 	CHECK_MINUTES_INC:
-	    BTFSS PORTB, RB4
-	    GOTO MINUTES_INCREMENT
-	CHECK_HOURS_INC:  
 	    BTFSS PORTB, RB5
-	    GOTO HOURS_INCREMENT
+	    GOTO MINUTES_DELAY
+	CHECK_HOURS_INC:  
+	    BTFSS PORTB, RB6
+	    GOTO HOURS_DELAY
 	    GOTO POP
-		
-	SECONDS_DISPLAY:
-	;    BTFSC PORTA,0		
-	 ;   GOTO second_hand_on	
-	  ;  BSF PORTA,0			; Apaga el LED
-	   ; GOTO SECONDS_INCREMENT
-	    ;second_hand_on:
-             ;   BCF PORTA,0			; Enciende el LED 
 	
 	SECONDS_INCREMENT:
 	    INCF seconds, f			; Circular increment of seconds.
@@ -150,18 +146,19 @@ ORG 0x0004
 	    GOTO POP
 	    MOVLW .0
 	    MOVWF seconds
-
-	MINUTES_DISPLAY:
-	    ;BTFSC PORTA, 1
-	    ;GOTO minute_hand_on
-	    ;BSF PORTA, 1
-	    ;GOTO MINUTES_INCREMENT
-	    ;minute_hand_on:
-	;	BCF PORTA, 1
+	    GOTO MINUTES_INCREMENT
 		
+	MINUTES_DELAY:
+	    MOVLW .255
+	    MOVWF minutes_delay_counter
+	    MOVWF minutes_delay_counter_1
+	    MINUTES_DELAY_LOOP:
+	    DECFSZ minutes_delay_counter
+	    GOTO MINUTES_DELAY_LOOP
+	    DECFSZ minutes_delay_counter_1
+	    GOTO MINUTES_DELAY_LOOP
+	    
 	MINUTES_INCREMENT:
-	    BTFSC alarm_status, 0
-	    GOTO MINUTES_INCREMENT_ALARM
 	    INCF minutes, f			; Circular increment of minutes.	
 	    MOVF minutes, 0
 	    SUBLW .60
@@ -170,26 +167,18 @@ ORG 0x0004
 	    MOVLW .0
 	    MOVWF minutes
 	    GOTO HOURS_INCREMENT
-	    MINUTES_INCREMENT_ALARM:
-		INCF alarm_minutes, f			; Circular increment of alarm minutes.	
-		MOVF alarm_minutes, 0
-		SUBLW .60
-		BTFSS STATUS, Z
-		GOTO POP
-		MOVLW .0
-		MOVWF alarm_minutes
-		GOTO POP
-	HOURS_DISPLAY:
-	 ;   BTFSC PORTA, 2
-	  ;  GOTO hour_hand_on
-	   ; BSF PORTA, 2
-	    ;GOTO HOURS_INCREMENT
-	    ;hour_hand_on:
-	;	BCF PORTA, 2
-	
+
+	HOURS_DELAY:
+	    MOVLW .255
+	    MOVWF hours_delay_counter
+	    MOVWF hours_delay_counter_1
+	    HOURS_DELAY_LOOP:
+	    DECFSZ hours_delay_counter
+	    GOTO HOURS_DELAY_LOOP
+	    DECFSZ hours_delay_counter_1
+	    GOTO HOURS_DELAY_LOOP
+	    
 	HOURS_INCREMENT:
-	    BTFSC alarm_status, 0
-	    GOTO HOURS_INCREMENT_ALARM
 	    INCF hours, f			; Circular increment of hours.
 	    MOVF hours, 0
 	    SUBLW .24
@@ -198,14 +187,6 @@ ORG 0x0004
 	    MOVLW .0
 	    MOVWF hours
 	    GOTO POP
-	    HOURS_INCREMENT_ALARM:
-		INCF alarm_hours, f			; Circular increment of alarm hours.
-		MOVF alarm_hours, 0
-		SUBLW .24
-		BTFSS STATUS, Z
-		GOTO POP
-		MOVLW .0
-		MOVWF alarm_hours
 ;*******EXIT INTERRUPT VECTOR***********************************************        
     POP:
 	bcf	STATUS,RP0        ; ensure file register bank set to 0
@@ -222,11 +203,10 @@ SETUP:
     BSF STATUS, RP0             ; Bank select 1
     CLRF TRISA       
     CLRF TRISB       
-    MOVLW b'11110000'
+    MOVLW b'11100000'
     MOVWF TRISB
-    CLRF TRISB
     CLRF TRISA
-    MOVLW b'10100000'		; Enables interrupts from TMR0 an RB (IOC).
+    MOVLW b'10101000'		; Enables interrupts from TMR0 an RB (IOC).
     MOVWF INTCON
 	    
     BCF OPTION_REG, T0CS        ; TMR0 CLOCK SOURCE: INTERNAL INSTRUCTION CYCLE CLOCK
@@ -244,31 +224,29 @@ SETUP:
     MOVLW .5
     MOVWF delay_counter_1
     
-    MOVLW .15			; Initial time.
+    MOVLW .45			; Initial time.
     MOVWF seconds
+    MOVLW .23
     MOVWF minutes
+    MOVLW .1
     MOVWF hours
     
     MOVLW .1
     MOVWF column_counter
     MOVWF column_index
     
+    CLRF animation
     CLRF xor_var
     CLRF stripe_1
     CLRF stripe_2
     CLRF stripe_3
     CLRF stripe_4
     CLRF space_stripe
-    CLRF alarm_minutes
-    CLRF alarm_hours
-    CLRF alarm_status		;To determine whether alarm is ON/OFF or in SET mode.
-				;  Bit	|   State   |	Mode
-				;   0	|     S	    |	Set
-				;	|     C	    |	Run
-				;   1	|     S	    |	Alarm ON
-				;	|     C	    |	Alarm OFF
+   
 MAINPROGRAM:
- CALL SPLIT_SECONDS		; Call to get HH:MM:SS
+    BTFSC animation, 0
+    GOTO ANIMATION_DISPLAY
+    CALL SPLIT_SECONDS		; Call to get HH:MM:SS
     CALL SPLIT_MINUTES
     CALL SPLIT_HOURS
     ;CALL CHECK_ALARM
@@ -279,18 +257,13 @@ MAINPROGRAM:
    BTFSC STATUS, C
    CALL display_hours_t
    
-   MOVF column_index, 0
+   MOVF column_index, 0		; Empty space between tuples.
    SUBLW .5
    BTFSS STATUS, Z
    GOTO CHECK_HOURS_U
    CLRF PORTA
    CLRF PORTB 
    GOTO EXIT
-   
-   ;INDEX=5
-   ;	clrf porta
-   ;	CLRF PORTB
-   ;	GOTO EXIT
    
    CHECK_HOURS_U:
    MOVF column_index, 0
@@ -432,16 +405,18 @@ MAINPROGRAM:
    EMPTY_SPACE_6:
    MOVF column_index, 0
    SUBLW .30
-   BTFSS STATUS, Z
-   GOTO HALF_OFF
-   CLRF PORTA
-   CLRF PORTB 
+   BTFSC STATUS, C
    GOTO EXIT
    
-   HALF_OFF:
+HALF_OFF:
     CLRF PORTA
     CLRF PORTB
-
+    GOTO EXIT
+    
+ANIMATION_DISPLAY:
+    MOVLW .255
+    MOVWF PORTA
+    MOVWF PORTB
 EXIT:
 GOTO MAINPROGRAM		; Unconditional loop.
     
@@ -892,13 +867,13 @@ ONE:
     RETURN
     
 TWO:
-    MOVLW b'01000011'
+    MOVLW b'11000010'
     MOVWF stripe_1
-    MOVLW b'10000101'
+    MOVLW b'10100001'
     MOVWF stripe_2
-    MOVLW b'10001001'
+    MOVLW b'10010001'
     MOVWF stripe_3
-    MOVLW b'01110001'
+    MOVLW b'10001110'
     MOVWF stripe_4
     RETURN
     
@@ -907,49 +882,49 @@ THREE:
     MOVWF stripe_1
     MOVLW b'10000001'
     MOVWF stripe_2
-    MOVLW b'10010001'
+    MOVLW b'10001001'
     MOVWF stripe_3
-    MOVLW b'01101110'
+    MOVLW b'01110110'
     MOVWF stripe_4
     RETURN
 
 FOUR:
-    MOVLW b'11111000'
+    MOVLW b'00011111'
     MOVWF stripe_1
-    MOVLW b'00001000'
+    MOVLW b'00010000'
     MOVWF stripe_2
-    MOVLW b'00111111'
+    MOVLW b'11111100'
     MOVWF stripe_3
-    MOVLW b'00001000'
+    MOVLW b'00010000'
     MOVWF stripe_4
     RETURN
     
 FIVE:
-    MOVLW b'11111010'
+    MOVLW b'01011111'
     MOVWF stripe_1
-    MOVLW b'10010001'
+    MOVLW b'10001001'
     MOVWF stripe_2
-    MOVLW b'10010001'
+    MOVLW b'10001001'
     MOVWF stripe_3
-    MOVLW b'10001110'
+    MOVLW b'01110001'
     MOVWF stripe_4
     RETURN
 
 SIX:
-    MOVLW b'00011110'
+    MOVLW b'01111000'
     MOVWF stripe_1
-    MOVLW b'00110001'
+    MOVLW b'10001100'
     MOVWF stripe_2
-    MOVLW b'01010001'
+    MOVLW b'10001010'
     MOVWF stripe_3
-    MOVLW b'10001110'
+    MOVLW b'01110001'
     MOVWF stripe_4
     RETURN
     
 SEVEN:
-    MOVLW b'10000000'
+    MOVLW b'00000001'
     MOVWF stripe_1
-    MOVLW b'10010000'
+    MOVLW b'00001001'
     MOVWF stripe_2
     MOVWF stripe_3
     MOVLW b'11111111'
@@ -966,12 +941,12 @@ EIGHT:
     RETURN
  
 NINE:
-    MOVLW b'01110001'
+    MOVLW b'10001110'
     MOVWF stripe_1
-    MOVLW b'10001001'
+    MOVLW b'10010001'
     MOVWF stripe_2
     MOVWF stripe_3
-    MOVLW b'01010111'
+    MOVLW b'11101010'
     MOVWF stripe_4
     RETURN
 
@@ -1051,18 +1026,4 @@ SWITCHCASE:		; Case implementation for display value assignment.
    DEFAULT:
     RETURN
     
-    
-CHECK_ALARM:
-    BTFSS alarm_status, 1   ;Alarm ON or OFF?
-    RETURN
-    MOVF minutes, 0
-    SUBWF alarm_minutes, 0
-    BTFSS STATUS, Z
-    RETURN
-    MOVF hours, 0
-    SUBWF alarm_hours, 0
-    BTFSS STATUS, Z
-    RETURN
-    ;Do something!!
-    RETURN
 END
