@@ -414,9 +414,12 @@ HALF_OFF:
     GOTO EXIT
     
 ANIMATION_DISPLAY:
-    MOVLW .255
-    MOVWF PORTA
-    MOVWF PORTB
+    BTFSS seconds, 0
+    GOTO ANIMATION_EVEN
+    CALL MAN_ODD
+    GOTO EXIT
+    ANIMATION_EVEN:
+    CALL MAN_EVEN
 EXIT:
 GOTO MAINPROGRAM		; Unconditional loop.
     
@@ -950,6 +953,114 @@ NINE:
     MOVWF stripe_4
     RETURN
 
+MAN_ODD:
+    MOVF column_index, 0
+    SUBLW .1
+    BTFSS STATUS, Z
+    GOTO man_odd_2
+    MOVLW .1
+    MOVWF PORTB
+    CLRF PORTA
+    RETURN
+    man_odd_2:
+    MOVF column_index, 0
+    SUBLW .2
+    BTFSS STATUS, Z
+    GOTO man_odd_3
+    MOVLW .4
+    MOVWF PORTB
+    MOVLW .10
+    MOVWF PORTA
+    RETURN
+    man_odd_3:
+    MOVF column_index, 0
+    SUBLW .3
+    BTFSS STATUS, Z
+    GOTO man_odd_4
+    MOVLW .3
+    MOVWF PORTB
+    MOVLW .14
+    MOVWF PORTA
+    RETURN
+    man_odd_4:
+    MOVF column_index, 0
+    SUBLW .4
+    BTFSS STATUS, Z
+    GOTO man_odd_5
+    MOVLW .4
+    MOVWF PORTB
+    MOVLW .10
+    MOVWF PORTA
+    RETURN
+    man_odd_5:
+    MOVF column_index, 0
+    SUBLW .5
+    BTFSS STATUS, Z
+    GOTO man_odd_off
+    MOVLW .4
+    MOVWF PORTA
+    CLRF PORTB
+    RETURN
+    man_odd_off:
+    CLRF PORTA
+    CLRF PORTB
+    RETURN
+    
+MAN_EVEN:
+    MOVF column_index, 0
+    SUBLW .1
+    BTFSS STATUS, Z
+    GOTO man_even_2
+    MOVLW .8
+    MOVWF PORTB
+    MOVLW .5
+    MOVWF PORTA
+    RETURN
+    man_even_2:
+    MOVF column_index, 0
+    SUBLW .2
+    BTFSS STATUS, Z
+    GOTO man_even_3
+    MOVLW .12
+    MOVWF PORTB
+    MOVLW .11
+    MOVWF PORTA
+    RETURN
+    man_even_3:
+    MOVF column_index, 0
+    SUBLW .3
+    BTFSS STATUS, Z
+    GOTO man_even_4
+    MOVLW .11
+    MOVWF PORTB
+    MOVLW .15
+    MOVWF PORTA
+    RETURN
+    man_even_4:
+    MOVF column_index, 0
+    SUBLW .4
+    BTFSS STATUS, Z
+    GOTO man_even_5
+    MOVLW .12
+    MOVWF PORTB
+    MOVLW .11
+    MOVWF PORTA
+    RETURN
+    man_even_5:
+    MOVF column_index, 0
+    SUBLW .5
+    BTFSS STATUS, Z
+    GOTO man_even_off
+    MOVLW .9
+    MOVWF PORTB
+    MOVLW .1
+    CLRF PORTA
+    RETURN
+    man_even_off:
+    CLRF PORTA
+    CLRF PORTB
+    RETURN
+    
 SWITCHCASE:		; Case implementation for display value assignment.
     MOVF xor_var,0
     XORLW .0		; Zero will result if W=L.
