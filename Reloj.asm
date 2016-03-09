@@ -34,7 +34,6 @@ stripe_1	res 1
 stripe_2	res 1
 stripe_3	res 1
 stripe_4	res 1
-space_stripe	res 1
 msb		res 1			; MSB for display.
 xor_var		res 1			; Storage variable for xor operation.
 minutes_delay_counter	res 1		; Variables for button debounce.
@@ -130,7 +129,7 @@ ORG 0x0004
 	    BCF animation, 0
 
 	    
-	CHECK_MINUTES_INC:
+	CHECK_MINUTES_INC:			; Check button press (Pull-up)
 	    BTFSS PORTB, RB5
 	    GOTO MINUTES_DELAY
 	CHECK_HOURS_INC:  
@@ -231,7 +230,7 @@ SETUP:
     MOVLW .1
     MOVWF hours
     
-    MOVLW .1
+    MOVLW .1			; Initialize counters. Reset at upper limit.
     MOVWF column_counter
     MOVWF column_index
     
@@ -241,17 +240,15 @@ SETUP:
     CLRF stripe_2
     CLRF stripe_3
     CLRF stripe_4
-    CLRF space_stripe
    
 MAINPROGRAM:
-    BTFSC animation, 0
+    BTFSC animation, 0		; Check mode. (Animation/Run)
     GOTO ANIMATION_DISPLAY
     CALL SPLIT_SECONDS		; Call to get HH:MM:SS
     CALL SPLIT_MINUTES
     CALL SPLIT_HOURS
-    ;CALL CHECK_ALARM
     
-   CHECK_HOURS_T:
+   CHECK_HOURS_T:		; Hour tens.
    MOVF column_index, 0
    SUBLW .4
    BTFSC STATUS, C
@@ -265,7 +262,7 @@ MAINPROGRAM:
    CLRF PORTB 
    GOTO EXIT
    
-   CHECK_HOURS_U:
+   CHECK_HOURS_U:		; Hour units.
    MOVF column_index, 0
    SUBLW .9
    BTFSC STATUS, C
@@ -286,13 +283,14 @@ MAINPROGRAM:
    CALL display_hours_u
    
    
-   EMPTY_SPACE_2:   
+   EMPTY_SPACE_2:		    ; Dot to separate hours from minutes.
    MOVF column_index, 0
    SUBLW .10
    BTFSS STATUS, Z
    GOTO CHECK_MINUTES_T
-   CLRF PORTA
-   CLRF PORTB 
+   MOVLW .8
+   MOVWF PORTA
+   CLRF PORTB
    GOTO EXIT
    
    CHECK_MINUTES_T:
@@ -349,8 +347,9 @@ MAINPROGRAM:
    SUBLW .20
    BTFSS STATUS, Z
    GOTO CHECK_SECONDS_T
-   CLRF PORTA
-   CLRF PORTB 
+   MOVLW .8
+   MOVWF PORTA
+   CLRF PORTB
    GOTO EXIT
    
    CHECK_SECONDS_T:
